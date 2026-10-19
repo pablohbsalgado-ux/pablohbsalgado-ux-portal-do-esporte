@@ -11,6 +11,8 @@ const LINKS = [
   { href: "/admin/plans", label: "Planos de sócio" },
   { href: "/admin/titles", label: "Títulos" },
   { href: "/admin/orders", label: "Pedidos" },
+  { href: "/admin/accounts", label: "Clientes" },
+  { href: "/admin/members", label: "Sócios" },
   { href: "/admin/settings", label: "Configurações" },
 ];
 

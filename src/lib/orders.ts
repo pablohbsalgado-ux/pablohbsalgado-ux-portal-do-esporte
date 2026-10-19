@@ -1,6 +1,8 @@
 import { revalidatePath } from "next/cache";
 import { getCollection, newId, updateCollection } from "./store";
-import type { Order, OrderItem, OrderStatus } from "./types";
+import { paymentsDemoMode, startPayment } from "./payments";
+import { setMemberStatus } from "./members";
+import type { MemberStatus, Order, OrderItem, OrderStatus } from "./types";
 
 export interface CartLine {
   kind: "product" | "plan";
@@ -18,11 +20,7 @@ export class CheckoutError extends Error {}
  */
 export async function priceCart(lines: CartLine[]): Promise<{ items: OrderItem[]; total: number }> {
   if (!Array.isArray(lines) || lines.length === 0 || lines.length > 30) throw new CheckoutError("Carrinho vazio ou inválido");
-  const [products, plans, settings] = await Promise.all([
-    getCollection("products"),
-    getCollection("plans"),
-    getCollection("settings"),
-  ]);
+  const [products, settings] = await Promise.all([getCollection("products"), getCollection("settings")]);
 
   const items: OrderItem[] = [];
   const wanted = new Map<string, number>();
@@ -32,10 +30,8 @@ export async function priceCart(lines: CartLine[]): Promise<{ items: OrderItem[]
     if (!Number.isFinite(quantity) || quantity < 1 || quantity > 20) throw new CheckoutError("Quantidade inválida");
 
     if (line.kind === "plan") {
-      const plan = plans.find((p) => p.id === line.id && p.active);
-      if (!plan) throw new CheckoutError("Plano indisponível");
-      items.push({ kind: "plan", refId: plan.id, name: `Sócio-Lobo: ${plan.name} (${plan.period})`, unitPrice: plan.price, quantity: 1 });
-      continue;
+      // A adesão de sócio tem ficha própria (/socio/[plano]) e não passa pelo carrinho.
+      throw new CheckoutError("A associação é feita pela ficha de adesão do Sócio-Lobo");
     }
 
     const product = products.find((p) => p.id === line.id && p.active);
@@ -70,6 +66,21 @@ export async function createOrder(data: Omit<Order, "id" | "createdAt" | "status
   return order;
 }
 
+/** Cria o pedido, inicia o pagamento no Mercado Pago e devolve o que o navegador precisa. */
+export async function placeOrder(data: Omit<Order, "id" | "createdAt" | "status" | "paymentId" | "stockApplied" | "demo">) {
+  const order = await createOrder({ ...data, demo: paymentsDemoMode() });
+  const payment = await startPayment(order);
+  await patchOrder(order.id, {
+    paymentId: payment.paymentId,
+    ...(payment.kind === "pix" ? { pix: { qrCodeBase64: payment.qrCodeBase64, copyPaste: payment.copyPaste, expiresAt: payment.expiresAt } } : {}),
+  });
+  return {
+    orderId: order.id,
+    total: order.total,
+    payment: payment.kind === "redirect" ? { kind: "redirect" as const, url: payment.url } : { kind: "pix" as const },
+  };
+}
+
 export async function patchOrder(id: string, patch: Partial<Order>) {
   let found: Order | undefined;
   await updateCollection("orders", (orders) =>
@@ -78,12 +89,24 @@ export async function patchOrder(id: string, patch: Partial<Order>) {
   return found;
 }
 
-/** Atualiza o status e, na primeira vez que o pedido fica pago, baixa o estoque. */
+const MEMBER_STATUS_BY_ORDER: Record<OrderStatus, MemberStatus> = {
+  pendente: "pendente",
+  pago: "ativo",
+  entregue: "ativo",
+  cancelado: "cancelado",
+};
+
+/**
+ * Atualiza o status e, na primeira vez que o pedido fica pago, baixa o estoque.
+ * Pedidos de adesão também atualizam a ficha do sócio (pago → sócio ativo).
+ */
 export async function setOrderStatus(id: string, status: OrderStatus) {
   let toApply: Order | undefined;
+  let memberId: string | undefined;
   await updateCollection("orders", (orders) =>
     orders.map((o) => {
       if (o.id !== id) return o;
+      memberId = o.memberId;
       const next = { ...o, status };
       if (status === "pago" && !o.stockApplied) {
         next.stockApplied = true;
@@ -100,6 +123,7 @@ export async function setOrderStatus(id: string, status: OrderStatus) {
     );
     revalidatePath("/vendas");
   }
+  if (memberId) await setMemberStatus(memberId, MEMBER_STATUS_BY_ORDER[status]);
 }
 
 export async function getOrder(id: string) {

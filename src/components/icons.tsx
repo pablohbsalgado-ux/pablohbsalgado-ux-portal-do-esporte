@@ -37,3 +37,6 @@ export const IconTrophy = ({ className }: P) => (
 export const IconCheck = ({ className }: P) => (
   <svg {...base(className)}><path d="M5 12l5 5L20 7" /></svg>
 );
+export const IconUser = ({ className }: P) => (
+  <svg {...base(className)}><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0116 0" /></svg>
+);

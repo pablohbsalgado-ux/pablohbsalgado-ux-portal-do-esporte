@@ -49,6 +49,16 @@ Os formulários do painel e a validação no servidor saem da mesma definição,
 
 ---
 
+## Contas de clientes e associação
+
+- **Compra de produtos exige conta.** O cliente cria a conta com nome completo, CPF (os dígitos são validados), telefone, e-mail e senha. A senha é guardada com scrypt, nunca em texto. O ícone de conta fica no topo do site; em `/conta` o cliente vê os dados, os pedidos e a associação, e pode trocar a senha.
+- **Associação (Sócio-Lobo)** tem ficha própria em `/socio/[plano]`, sem exigir conta. Se o cliente estiver logado, os dados vêm preenchidos. Planos marcados como **"Plano de atleta"** exigem foto de perfil, modalidades, comprovante de matrícula e o termo de responsabilidade do atleta. O termo do associado vale para todos. Os textos dos termos ficam em `src/lib/terms.ts`.
+- A ficha vira **ativa** quando o pagamento é aprovado e **cancelada** se o pagamento for cancelado.
+- **Documentos privados** (foto e comprovante) ficam fora da área pública: no Supabase, na tabela `private_files`, acessível só com o token; no modo json, em `data/private/`. A diretoria abre esses arquivos pelo painel, em `/api/admin/private/...`.
+- No **painel**: em **Clientes**, cada conta aparece com suas compras e o total pago, com busca, CSV e o botão "Senha provisória" para quem esqueceu a senha. Em **Sócios** ficam a ficha completa, os documentos, o aceite dos termos, o status e a exportação em CSV. Em **Pedidos**, a marcação *Conta* ou *Adesão* indica a origem.
+
+---
+
 ## Onde o conteúdo fica salvo
 
 O acesso aos dados passa todo por `src/lib/store.ts`. Escolha o armazenamento pela variável `CONTENT_STORE`:

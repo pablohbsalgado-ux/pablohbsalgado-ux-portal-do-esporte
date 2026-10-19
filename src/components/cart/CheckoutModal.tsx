@@ -3,11 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { brl } from "@/lib/format";
+import { formatCpfClient } from "../account/format";
+import { AuthForms } from "../account/AuthForms";
+import { useAccount } from "../account/AccountProvider";
 import { useCart } from "./CartProvider";
 import { IconClose } from "../icons";
 
 export function CheckoutModal() {
   const cart = useCart();
+  const { account, loading, logout } = useAccount();
   const router = useRouter();
   const [method, setMethod] = useState<"pix" | "card">("pix");
   const [busy, setBusy] = useState(false);
@@ -19,23 +23,17 @@ export function CheckoutModal() {
     e.preventDefault();
     setBusy(true);
     setError("");
-    const form = new FormData(e.currentTarget);
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           method,
-          customer: {
-            name: form.get("name"),
-            email: form.get("email"),
-            phone: form.get("phone"),
-            cpf: form.get("cpf"),
-          },
           items: cart.items.map((i) => ({ kind: i.kind, id: i.id, quantity: i.quantity, size: i.size, customization: i.customization })),
         }),
       });
       const data = await res.json();
+      if (res.status === 401) await logout(); // sessão expirou: volta para a tela de login
       if (!res.ok) throw new Error(data.error || "Não foi possível iniciar o pagamento");
       cart.clear();
       cart.setCheckoutOpen(false);
@@ -54,6 +52,19 @@ export function CheckoutModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label="Finalizar compra">
       <button className="absolute inset-0 bg-black/60" aria-label="Fechar" onClick={() => cart.setCheckoutOpen(false)} />
+      {!account ? (
+        <div className="relative max-h-[92vh] w-full max-w-lg animate-rise overflow-y-auto rounded-t-2xl bg-white p-6 sm:rounded-2xl">
+          <div className="mb-4 flex items-start justify-between">
+            <h2 className="text-2xl text-lobo-navy">Identifique-se</h2>
+            <button type="button" onClick={() => cart.setCheckoutOpen(false)} aria-label="Fechar"><IconClose /></button>
+          </div>
+          {loading ? (
+            <p className="py-10 text-center text-slate-500">Carregando…</p>
+          ) : (
+            <AuthForms intro="Para comprar na loja é preciso ter uma conta. Assim você acompanha seus pedidos e a diretoria localiza sua compra na retirada." />
+          )}
+        </div>
+      ) : (
       <form onSubmit={submit} className="relative max-h-[92vh] w-full max-w-lg animate-rise overflow-y-auto rounded-t-2xl bg-white p-6 sm:rounded-2xl">
         <div className="mb-5 flex items-start justify-between">
           <div>
@@ -63,23 +74,13 @@ export function CheckoutModal() {
           <button type="button" onClick={() => cart.setCheckoutOpen(false)} aria-label="Fechar"><IconClose /></button>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <label className="label" htmlFor="co-name">Nome completo</label>
-            <input id="co-name" name="name" required minLength={3} className="input" autoComplete="name" />
+        <div className="flex items-center justify-between gap-3 rounded-xl border-2 border-lobo-navy/15 bg-lobo-paper p-4 text-sm">
+          <div className="min-w-0">
+            <p className="label !mb-0.5">Comprando como</p>
+            <p className="truncate font-bold text-lobo-navy">{account?.fullName}</p>
+            <p className="truncate text-xs text-slate-500">{account?.email} · CPF {formatCpfClient(account?.cpf ?? "")}</p>
           </div>
-          <div className="sm:col-span-2">
-            <label className="label" htmlFor="co-email">E-mail</label>
-            <input id="co-email" name="email" type="email" required className="input" autoComplete="email" />
-          </div>
-          <div>
-            <label className="label" htmlFor="co-phone">WhatsApp</label>
-            <input id="co-phone" name="phone" className="input" inputMode="tel" autoComplete="tel" placeholder="(21) 99999-0000" />
-          </div>
-          <div>
-            <label className="label" htmlFor="co-cpf">CPF</label>
-            <input id="co-cpf" name="cpf" className="input" inputMode="numeric" placeholder="Somente números" pattern="\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2}" />
-          </div>
+          <button type="button" onClick={logout} className="flex-none text-xs font-bold uppercase text-lobo-red hover:underline">Trocar conta</button>
         </div>
 
         <fieldset className="mt-5">
@@ -105,6 +106,7 @@ export function CheckoutModal() {
         </button>
         <p className="mt-2 text-center text-xs text-slate-500">O valor final é confirmado pelo servidor com os preços atuais da loja.</p>
       </form>
+      )}
     </div>
   );
 }

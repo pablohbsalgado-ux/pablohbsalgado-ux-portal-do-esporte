@@ -10,7 +10,7 @@ function secret() {
   return s;
 }
 
-async function hmac(message: string) {
+export async function hmacHex(message: string) {
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret()),
@@ -31,7 +31,7 @@ function safeEqual(a: string, b: string) {
 
 export async function createSessionToken() {
   const exp = String(Date.now() + SESSION_HOURS * 3_600_000);
-  return `${exp}.${await hmac(exp)}`;
+  return `${exp}.${await hmacHex(exp)}`;
 }
 
 export async function verifySessionToken(token: string | undefined) {
@@ -39,7 +39,7 @@ export async function verifySessionToken(token: string | undefined) {
   const [exp, sig] = token.split(".");
   if (!exp || !sig || Number(exp) < Date.now()) return false;
   try {
-    return safeEqual(sig, await hmac(exp));
+    return safeEqual(sig, await hmacHex(exp));
   } catch {
     return false;
   }
@@ -49,5 +49,5 @@ export async function checkPassword(input: string) {
   const expected = process.env.ADMIN_PASSWORD;
   if (!expected) return false;
   // compara os HMACs para não vazar o tamanho da senha pelo tempo de resposta
-  return safeEqual(await hmac(`pw:${input}`), await hmac(`pw:${expected}`));
+  return safeEqual(await hmacHex(`pw:${input}`), await hmacHex(`pw:${expected}`));
 }

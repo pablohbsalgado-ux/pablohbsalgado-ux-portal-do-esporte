@@ -72,3 +72,34 @@ revoke all on function public.portal_get(text, text), public.portal_set(text, te
   public.portal_upload_put(text, text, text, text), public.portal_upload_get(text) from public;
 grant execute on function public.portal_get(text, text), public.portal_set(text, text, jsonb),
   public.portal_upload_put(text, text, text, text), public.portal_upload_get(text) to anon, authenticated;
+
+-- ---------- Arquivos privados dos sócios (foto, comprovante de matrícula) ----------
+-- Leitura e gravação exigem o token: nada aqui é público, nem as imagens.
+create table if not exists public.private_files (
+  name text primary key,
+  mime text not null,
+  data bytea not null,
+  created_at timestamptz not null default now()
+);
+alter table public.private_files enable row level security;
+revoke all on public.private_files from anon, authenticated;
+
+create or replace function public.portal_private_put(p_token text, p_name text, p_mime text, p_b64 text) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  perform private.check_token(p_token);
+  if p_mime not in ('image/jpeg', 'image/png', 'image/webp', 'application/pdf') then
+    raise exception 'tipo de arquivo inválido';
+  end if;
+  insert into public.private_files (name, mime, data) values (p_name, p_mime, decode(p_b64, 'base64'));
+end $$;
+
+create or replace function public.portal_private_get(p_token text, p_name text) returns table (mime text, b64 text)
+language plpgsql security definer set search_path = '' stable as $$
+begin
+  perform private.check_token(p_token);
+  return query select f.mime, encode(f.data, 'base64') from public.private_files f where f.name = p_name;
+end $$;
+
+revoke all on function public.portal_private_put(text, text, text, text), public.portal_private_get(text, text) from public;
+grant execute on function public.portal_private_put(text, text, text, text), public.portal_private_get(text, text) to anon, authenticated;

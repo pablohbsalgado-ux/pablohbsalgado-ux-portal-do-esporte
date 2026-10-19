@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { brl } from "@/lib/format";
 import type { Plan, Product } from "@/lib/types";
@@ -10,7 +11,6 @@ import { IconCheck } from "../icons";
 const PERIOD: Record<Plan["period"], string> = { mensal: "/mês", semestral: "/semestre", anual: "/ano" };
 
 export function PlansSection({ plans }: { plans: Plan[] }) {
-  const cart = useCart();
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {plans.map((p) => (
@@ -35,16 +35,9 @@ export function PlansSection({ plans }: { plans: Plan[] }) {
               </li>
             ))}
           </ul>
-          <button
-            className={`${p.highlight ? "btn-red" : "btn-navy"} mt-7 w-full py-3 text-base`}
-            onClick={() => {
-              cart.add({ kind: "plan", id: p.id, name: `Sócio-Lobo: ${p.name}`, image: "/img/logo.png", price: p.price });
-              cart.setOpen(false);
-              cart.setCheckoutOpen(true);
-            }}
-          >
+          <Link href={`/socio/${p.id}`} className={`${p.highlight ? "btn-red" : "btn-navy"} mt-7 w-full py-3 text-base`}>
             Assinar agora
-          </button>
+          </Link>
         </article>
       ))}
       {plans.length === 0 && <EmptyState>Adesões abertas em breve.</EmptyState>}

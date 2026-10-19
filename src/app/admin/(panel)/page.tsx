@@ -3,13 +3,15 @@ import { brl, formatDate, gameStatus, splitGames, todayISO } from "@/lib/format"
 import { getCollection } from "@/lib/store";
 
 export default async function AdminHome() {
-  const [games, trainings, products, plans, titles, orders] = await Promise.all([
+  const [games, trainings, products, plans, titles, orders, accounts, members] = await Promise.all([
     getCollection("games"),
     getCollection("trainings"),
     getCollection("products"),
     getCollection("plans"),
     getCollection("titles"),
     getCollection("orders"),
+    getCollection("accounts"),
+    getCollection("members"),
   ]);
   const today = todayISO();
   const { upcoming } = splitGames(games, today);
@@ -24,6 +26,8 @@ export default async function AdminHome() {
     { href: "/admin/plans", n: plans.filter((p) => p.active).length, l: "planos de sócio" },
     { href: "/admin/titles", n: titles.length, l: "títulos" },
     { href: "/admin/orders", n: brl(paid.reduce((s, o) => s + o.total, 0)), l: `vendido (${paid.length} pedidos)` },
+    { href: "/admin/accounts", n: accounts.length, l: "clientes cadastrados" },
+    { href: "/admin/members", n: members.filter((m) => m.status === "ativo").length, l: `sócios ativos (${members.filter((m) => m.status === "pendente").length} pendentes)` },
   ];
 
   return (
@@ -31,7 +35,7 @@ export default async function AdminHome() {
       <h1 className="text-3xl text-lobo-navy">Visão geral</h1>
       <p className="text-sm text-slate-500">Tudo que você altera aqui aparece no site na hora.</p>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
         {stats.map((s) => (
           <Link key={s.l} href={s.href} className="card p-4 hover:border-lobo-red">
             <p className="font-display text-3xl text-lobo-navy">{s.n}</p>

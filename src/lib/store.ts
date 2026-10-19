@@ -89,6 +89,8 @@ const EMPTY: { [K in CollectionName]: () => Collections[K] } = {
   plans: () => [],
   titles: () => [],
   orders: () => [],
+  accounts: () => [],
+  members: () => [],
   settings: () => ({
     siteName: "Portal do Esporte",
     tagline: "",

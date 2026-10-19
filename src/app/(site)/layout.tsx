@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { AccountProvider } from "@/components/account/AccountProvider";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { CheckoutModal } from "@/components/cart/CheckoutModal";
@@ -9,6 +10,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const year = new Date().getFullYear();
 
   return (
+    <AccountProvider>
     <CartProvider>
       <Header announcement={settings.announcement} siteName={settings.siteName} />
       <main className="min-h-[70vh]">{children}</main>
@@ -38,5 +40,6 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <CartDrawer />
       <CheckoutModal />
     </CartProvider>
+    </AccountProvider>
   );
 }

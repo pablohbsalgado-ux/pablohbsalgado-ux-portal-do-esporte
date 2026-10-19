@@ -27,9 +27,9 @@ export function OrdersTable({ initial }: { initial: Order[] }) {
   }
 
   function exportCsv() {
-    const rows = [["pedido", "data", "status", "metodo", "total", "nome", "email", "telefone", "itens"]];
+    const rows = [["pedido", "data", "status", "metodo", "total", "nome", "email", "telefone", "cpf", "tipo", "itens"]];
     for (const o of list) {
-      rows.push([o.id, o.createdAt, o.status, o.method, o.total.toFixed(2), o.customer.name, o.customer.email, o.customer.phone,
+      rows.push([o.id, o.createdAt, o.status, o.method, o.total.toFixed(2), o.customer.name, o.customer.email, o.customer.phone, o.customer.cpf, o.memberId ? "adesão" : o.accountId ? "loja (conta)" : "loja",
         o.items.map((i) => `${i.quantity}x ${i.name}${i.size ? ` ${i.size}` : ""}${i.customization ? ` [${i.customization.name} ${i.customization.number}]` : ""}`).join(" | ")]);
     }
     const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(";")).join("\n");
@@ -68,7 +68,15 @@ export function OrdersTable({ initial }: { initial: Order[] }) {
                 <tr className="cursor-pointer hover:bg-slate-50" onClick={() => setOpen(open === o.id ? null : o.id)}>
                   <td className="whitespace-nowrap px-4 py-2.5 font-mono text-xs">{o.id}{o.demo && <span className="ml-1 rounded bg-amber-100 px-1 text-[10px] text-amber-800">demo</span>}</td>
                   <td className="whitespace-nowrap px-4 py-2.5">{new Date(o.createdAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</td>
-                  <td className="px-4 py-2.5">{o.customer.name}<span className="block text-xs text-slate-500">{o.customer.email}</span></td>
+                  <td className="px-4 py-2.5">
+                    {o.customer.name}
+                    {o.memberId ? (
+                      <span className="ml-2 rounded bg-lobo-red px-1.5 text-[10px] font-bold uppercase text-white">Adesão</span>
+                    ) : o.accountId ? (
+                      <span className="ml-2 rounded bg-lobo-navy px-1.5 text-[10px] font-bold uppercase text-white">Conta</span>
+                    ) : null}
+                    <span className="block text-xs text-slate-500">{o.customer.email}</span>
+                  </td>
                   <td className="whitespace-nowrap px-4 py-2.5 font-semibold">{brl(o.total)}</td>
                   <td className="px-4 py-2.5 uppercase">{o.method === "pix" ? "Pix" : "Cartão"}</td>
                   <td className="px-4 py-2.5" onClick={(e) => e.stopPropagation()}>

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useAccount } from "./account/AccountProvider";
 import { useCart } from "./cart/CartProvider";
-import { IconCart, IconClose, IconMenu } from "./icons";
+import { IconCart, IconClose, IconMenu, IconUser } from "./icons";
 
 const NAV = [
   { href: "/jogos", label: "Jogos" },
@@ -16,6 +17,7 @@ const NAV = [
 export function Header({ announcement, siteName }: { announcement?: string; siteName: string }) {
   const pathname = usePathname();
   const cart = useCart();
+  const { account } = useAccount();
   const [menu, setMenu] = useState(false);
 
   return (
@@ -51,9 +53,23 @@ export function Header({ announcement, siteName }: { announcement?: string; site
             })}
           </nav>
 
+          <Link
+            href={account ? "/conta" : "/conta/entrar"}
+            onClick={() => setMenu(false)}
+            className="ml-auto flex items-center gap-2 rounded-lg p-2 hover:bg-white/10 md:ml-2"
+            aria-label={account ? `Minha conta (${account.fullName})` : "Entrar ou criar conta"}
+            title={account ? "Minha conta" : "Entrar"}
+          >
+            <span className={`grid h-8 w-8 place-items-center rounded-full ${account ? "bg-lobo-red font-display text-sm" : "border-2 border-white/70"}`}>
+              {account ? account.fullName.trim()[0]?.toUpperCase() : <IconUser className="h-4 w-4" />}
+            </span>
+            <span className="hidden text-xs font-bold uppercase leading-tight lg:block">
+              {account ? <>Olá,<br />{account.fullName.split(" ")[0]}</> : <>Entrar /<br />Cadastrar</>}
+            </span>
+          </Link>
           <button
             onClick={() => cart.setOpen(true)}
-            className="relative ml-auto rounded-lg p-2 hover:bg-white/10 md:ml-2"
+            className="relative rounded-lg p-2 hover:bg-white/10"
             aria-label={`Abrir carrinho (${cart.count} itens)`}
           >
             <IconCart className="h-6 w-6" />

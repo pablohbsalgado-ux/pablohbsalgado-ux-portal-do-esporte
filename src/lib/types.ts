@@ -63,6 +63,7 @@ export interface Plan {
   benefits: string[];
   highlight: boolean;
   active: boolean;
+  athlete?: boolean; // plano de atleta: exige foto, modalidades, comprovante e termo de atleta
 }
 
 export type Placement = "campeao" | "vice" | "terceiro" | "destaque";
@@ -117,6 +118,50 @@ export interface Order {
   stockApplied: boolean;
   demo: boolean;
   pix?: { qrCodeBase64: string; copyPaste: string; expiresAt: string };
+  accountId?: string; // compra de produtos: conta que fez o pedido
+  memberId?: string; // adesão de sócio: ficha vinculada
+}
+
+/** Conta de cliente (obrigatória para comprar produtos). */
+export interface Account {
+  id: string;
+  createdAt: string;
+  fullName: string;
+  cpf: string; // só dígitos
+  phone: string; // só dígitos
+  email: string; // minúsculo
+  passwordHash: string; // scrypt$salt$hash — nunca sai do servidor
+}
+
+export type PublicAccount = Omit<Account, "passwordHash">;
+
+export type EnrollmentStatus = "ativo" | "formado" | "nao_aluno";
+export type MemberStatus = "pendente" | "ativo" | "cancelado";
+
+/** Ficha de associação (Sócio-Lobo). */
+export interface Member {
+  id: string;
+  createdAt: string;
+  status: MemberStatus;
+  planId: string;
+  planName: string;
+  athlete: boolean;
+  accountId: string;
+  orderId: string;
+  fullName: string;
+  email: string;
+  cpf: string;
+  phone: string;
+  birthDate: string; // AAAA-MM-DD
+  enrollmentStatus: EnrollmentStatus;
+  instagram: string;
+  course: string;
+  sex: "Masculino" | "Feminino";
+  modalities: string[]; // atleta
+  photo: string; // arquivo privado (atleta)
+  enrollmentProof: string; // arquivo privado
+  generalTermsAcceptedAt: string;
+  athleteTermsAcceptedAt: string; // atleta
 }
 
 export interface Collections {
@@ -126,6 +171,8 @@ export interface Collections {
   plans: Plan[];
   titles: Title[];
   orders: Order[];
+  accounts: Account[];
+  members: Member[];
   settings: Settings;
 }
 

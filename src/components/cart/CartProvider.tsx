@@ -44,7 +44,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setItems(JSON.parse(raw));
+      // planos de sócio não passam mais pelo carrinho (têm ficha de adesão própria)
+      if (raw) setItems((JSON.parse(raw) as CartItem[]).filter((i) => i.kind === "product"));
     } catch {}
     setLoaded(true);
   }, []);
