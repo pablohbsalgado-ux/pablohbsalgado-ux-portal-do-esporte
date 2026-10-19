@@ -1,6 +1,6 @@
 import { GamesView } from "@/components/games/GamesView";
 import { PageHero } from "@/components/ui";
-import { todayISO } from "@/lib/format";
+import { modalitiesInUse, todayISO } from "@/lib/format";
 import { getCollection } from "@/lib/store";
 
 export const metadata = { title: "Jogos do Lobo" };
@@ -13,7 +13,7 @@ export default async function JogosPage() {
       <PageHero kicker="Calendário" title="Jogos do Lobo">
         Agenda completa das partidas e resultados de todas as modalidades.
       </PageHero>
-      <GamesView games={games} modalities={settings.modalities} today={todayISO()} />
+      <GamesView games={games} modalities={modalitiesInUse(settings.modalities, games.map((g) => g.modality))} today={todayISO()} />
     </>
   );
 }

@@ -89,6 +89,8 @@ export interface Settings {
   whatsapp: string;
   email: string;
   announcement: string;
+  schedulePeriod: string;
+  scheduleNotice: string;
 }
 
 export type OrderStatus = "pendente" | "pago" | "cancelado" | "entregue";

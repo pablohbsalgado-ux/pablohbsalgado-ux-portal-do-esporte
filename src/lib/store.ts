@@ -99,6 +99,8 @@ const EMPTY: { [K in CollectionName]: () => Collections[K] } = {
     whatsapp: "",
     email: "",
     announcement: "",
+    schedulePeriod: "",
+    scheduleNotice: "",
   }),
 };
 

@@ -2,10 +2,19 @@
   "siteName": "Portal do Lobo",
   "tagline": "A alcateia joga junto. Jogos, treinos, loja e títulos da Atlética CEFET-RJ.",
   "announcement": "Seletiva de vôlei feminino nesta quinta, 18h, Quadra 1 do CEFET!",
-  "modalities": ["Futsal", "Basquete", "Vôlei", "Handebol", "Futebol de Campo"],
+  "modalities": [
+    "Futsal",
+    "Basquete",
+    "Vôlei",
+    "Handebol",
+    "Futebol de Campo",
+    "Pelada do Lobo"
+  ],
   "customizationPrice": 20,
   "memberDiscountPercent": 15,
   "instagram": "atleticalobo",
   "whatsapp": "21999990000",
-  "email": "contato@atleticalobo.com.br"
+  "email": "contato@atleticalobo.com.br",
+  "schedulePeriod": "2026.2 · de 17/08 até 19/11",
+  "scheduleNotice": "Os treinos podem sofrer alteração de data, horário e local."
 }

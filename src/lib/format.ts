@@ -67,6 +67,12 @@ export const PLACEMENT_LABEL: Record<Placement, string> = {
   destaque: "Destaque",
 };
 
+/** Modalidades que aparecem em `used`, na ordem cadastrada nas Configurações (as não cadastradas vão ao fim). */
+export function modalitiesInUse(configured: string[], used: string[]) {
+  const set = new Set(used);
+  return [...configured.filter((m) => set.has(m)), ...[...set].filter((m) => !configured.includes(m))];
+}
+
 export function minutes(time: string) {
   const [h, m] = time.split(":").map(Number);
   return h * 60 + m;
