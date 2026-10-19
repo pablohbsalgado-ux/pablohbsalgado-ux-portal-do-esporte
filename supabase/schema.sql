@@ -103,3 +103,46 @@ end $$;
 
 revoke all on function public.portal_private_put(text, text, text, text), public.portal_private_get(text, text) from public;
 grant execute on function public.portal_private_put(text, text, text, text), public.portal_private_get(text, text) to anon, authenticated;
+
+-- ---------- Histórico de alterações do painel (somente inclusão) ----------
+create table if not exists public.audit_log (
+  id text primary key,
+  at timestamptz not null default now(),
+  entry jsonb not null
+);
+create index if not exists audit_log_at_idx on public.audit_log (at desc);
+alter table public.audit_log enable row level security;
+revoke all on public.audit_log from anon, authenticated;
+
+-- Imutável: UPDATE, DELETE e TRUNCATE são recusados, venham de onde vierem.
+create or replace function private.audit_log_immutable() returns trigger
+language plpgsql set search_path = '' as $fn$
+begin
+  raise exception 'Historico de alteracoes nao pode ser editado nem apagado';
+end $fn$;
+drop trigger if exists audit_log_no_change on public.audit_log;
+create trigger audit_log_no_change before update or delete on public.audit_log
+  for each row execute function private.audit_log_immutable();
+drop trigger if exists audit_log_no_truncate on public.audit_log;
+create trigger audit_log_no_truncate before truncate on public.audit_log
+  for each statement execute function private.audit_log_immutable();
+
+-- A data/hora gravada é a do banco, não a enviada pelo site.
+create or replace function public.portal_audit_add(p_token text, p_entry jsonb) returns void
+language plpgsql security definer set search_path = '' as $$
+declare ts timestamptz := now();
+begin
+  perform private.check_token(p_token);
+  insert into public.audit_log (id, at, entry)
+  values (p_entry->>'id', ts, jsonb_set(p_entry, '{at}', to_jsonb(ts)));
+end $$;
+
+create or replace function public.portal_audit_list(p_token text, p_limit int) returns setof jsonb
+language plpgsql security definer set search_path = '' stable as $$
+begin
+  perform private.check_token(p_token);
+  return query select a.entry from public.audit_log a order by a.at desc limit least(greatest(p_limit, 1), 10000);
+end $$;
+
+revoke all on function public.portal_audit_add(text, jsonb), public.portal_audit_list(text, int) from public;
+grant execute on function public.portal_audit_add(text, jsonb), public.portal_audit_list(text, int) to anon, authenticated;

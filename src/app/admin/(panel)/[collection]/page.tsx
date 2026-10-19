@@ -23,7 +23,7 @@ async function accountRows(): Promise<AccountRow[]> {
 
 export default async function CollectionPage({ params }: { params: Promise<{ collection: string }> }) {
   const spec = specFor((await params).collection);
-  if (!spec) notFound();
+  if (!spec || spec.name === "adminUsers") notFound();
   const settings = await getCollection("settings");
 
   return (

@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/admin/LoginForm";
+import { ADMIN_PROFILES } from "@/lib/admin-users";
 
 export const metadata = { title: "Painel — Entrar", robots: { index: false } };
 
@@ -10,7 +11,7 @@ export default function LoginPage() {
         <img src="/img/logo.png" alt="" className="mx-auto h-16 w-16" />
         <h1 className="mt-3 text-center text-2xl text-lobo-navy">Painel da diretoria</h1>
         <p className="mb-6 text-center text-sm text-slate-500">Acesso restrito à diretoria da A.A.A. CEFET/RJ</p>
-        <LoginForm />
+        <LoginForm profiles={ADMIN_PROFILES.map(({ id, name }) => ({ id, name }))} />
       </div>
     </div>
   );

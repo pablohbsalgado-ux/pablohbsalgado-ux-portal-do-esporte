@@ -16,14 +16,24 @@ const LINKS = [
   { href: "/admin/settings", label: "Configurações" },
 ];
 
-export function AdminNav() {
+const OWNER_LINKS = [
+  { href: "/admin/historico", label: "Histórico de alterações" },
+  { href: "/admin/perfis", label: "Perfis de acesso" },
+];
+
+export function AdminNav({ isDataOwner }: { isDataOwner: boolean }) {
   const pathname = usePathname();
+  const links = [...LINKS, ...(isDataOwner ? OWNER_LINKS : []), { href: "/admin/minha-senha", label: "Minha senha" }];
   return (
     <nav className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible" aria-label="Painel">
-      {LINKS.map((l) => {
+      {links.map((l) => {
         const active = l.href === "/admin" ? pathname === "/admin" : pathname.startsWith(l.href);
         return (
-          <Link key={l.href} href={l.href} className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium ${active ? "bg-lobo-red text-white" : "text-white/80 hover:bg-white/10"}`}>
+          <Link
+            key={l.href}
+            href={l.href}
+            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium ${active ? "bg-lobo-red text-white" : "text-white/80 hover:bg-white/10"} ${l.href === "/admin/historico" ? "md:mt-3 md:border-t md:border-white/15 md:pt-3" : ""}`}
+          >
             {l.label}
           </Link>
         );

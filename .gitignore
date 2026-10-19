@@ -10,3 +10,5 @@ data/orders.json
 data/accounts.json
 data/members.json
 data/private/
+data/adminUsers.json
+data/audit.jsonl

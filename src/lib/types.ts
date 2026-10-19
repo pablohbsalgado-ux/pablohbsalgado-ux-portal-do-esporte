@@ -173,7 +173,37 @@ export interface Collections {
   orders: Order[];
   accounts: Account[];
   members: Member[];
+  adminUsers: AdminUser[];
   settings: Settings;
 }
 
 export type CollectionName = keyof Collections;
+
+/** Perfil de acesso ao painel (uma senha por diretoria/conselho). */
+export interface AdminUser {
+  id: string; // chave fixa do perfil (ex.: "presidencia")
+  name: string;
+  passwordHash: string; // scrypt — nunca sai do servidor
+  sessionVersion: number; // muda ao trocar a senha: derruba sessões antigas
+  passwordChangedAt: string;
+  lastLoginAt: string;
+}
+
+export interface AuditChange {
+  field: string;
+  before: string;
+  after: string;
+}
+
+/** Registro do histórico de alterações do painel (somente inclusão). */
+export interface AuditEntry {
+  id: string;
+  at: string;
+  actorId: string;
+  actorName: string;
+  action: "criar" | "editar" | "excluir" | "status" | "senha" | "upload" | "login" | "login_falhou" | "logout";
+  area: string;
+  target: string;
+  changes: AuditChange[];
+  ip: string;
+}

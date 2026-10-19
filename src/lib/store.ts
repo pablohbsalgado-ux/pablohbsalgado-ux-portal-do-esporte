@@ -91,6 +91,7 @@ const EMPTY: { [K in CollectionName]: () => Collections[K] } = {
   orders: () => [],
   accounts: () => [],
   members: () => [],
+  adminUsers: () => [],
   settings: () => ({
     siteName: "Portal do Esporte",
     tagline: "",

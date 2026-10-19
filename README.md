@@ -28,7 +28,7 @@ Sem `MP_ACCESS_TOKEN` o checkout funciona em **modo demonstração**: gera um Pi
 
 ## Painel administrativo (`/admin`)
 
-Protegido por senha (`ADMIN_PASSWORD`). A sessão dura 12 h, fica num cookie `httpOnly` assinado e há limite de tentativas de login. Toda alteração salva é **publicada no site na hora**.
+Protegido por perfis com senha individual (veja *Perfis do painel* abaixo). A sessão dura 12 h, fica num cookie `httpOnly` assinado e há limite de tentativas de login. Toda alteração salva é **publicada no site na hora**.
 
 | Seção | O que a diretoria pode fazer |
 |---|---|
@@ -56,6 +56,18 @@ Os formulários do painel e a validação no servidor saem da mesma definição,
 - A ficha vira **ativa** quando o pagamento é aprovado e **cancelada** se o pagamento for cancelado.
 - **Documentos privados** (foto e comprovante) ficam fora da área pública: no Supabase, na tabela `private_files`, acessível só com o token; no modo json, em `data/private/`. A diretoria abre esses arquivos pelo painel, em `/api/admin/private/...`.
 - No **painel**: em **Clientes**, cada conta aparece com suas compras e o total pago, com busca, CSV e o botão "Senha provisória" para quem esqueceu a senha. Em **Sócios** ficam a ficha completa, os documentos, o aceite dos termos, o status e a exportação em CSV. Em **Pedidos**, a marcação *Conta* ou *Adesão* indica a origem.
+
+---
+
+## Perfis do painel e histórico de alterações
+
+O painel tem **8 acessos**, cada um com a própria senha: Presidência, Vice-presidência, Diretoria Administrativa Financeira, Diretoria de Esportes, Diretoria de Marketing, Conselho Administrativo, Conselho de Beneméritos e **Data Owner**.
+
+- No login, a pessoa escolhe o perfil e digita a senha. As senhas são guardadas com scrypt, e cada perfil pode trocar a sua em **Minha senha**.
+- Toda ação no painel fica registrada no **Histórico de alterações**, visível só para o Data Owner: criar, editar e excluir itens (com o valor antes e depois de cada campo), mudanças de status de pedidos e sócios, senhas, envio de imagens, entradas, saídas e tentativas com senha errada.
+- O histórico é **somente inclusão**. No Supabase, a tabela `audit_log` recusa UPDATE, DELETE e TRUNCATE, e a data gravada é a do banco.
+- Em **Perfis de acesso**, o Data Owner vê o último acesso e as alterações de cada perfil e pode gerar uma senha nova, o que desconecta o perfil de todos os dispositivos.
+- Numa instalação nova, sem nenhum perfil cadastrado, `ADMIN_PASSWORD` funciona como senha do Data Owner até ele gerar a própria senha.
 
 ---
 

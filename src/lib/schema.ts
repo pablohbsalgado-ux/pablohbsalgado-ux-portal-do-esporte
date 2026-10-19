@@ -197,6 +197,14 @@ export const SPECS: Record<CollectionName, CollectionSpec> = {
     columns: [],
     fields: [],
   },
+  adminUsers: {
+    name: "adminUsers",
+    label: "Perfis de acesso",
+    singular: "perfil",
+    readOnly: true,
+    columns: [],
+    fields: [],
+  },
   settings: {
     name: "settings",
     label: "Configurações gerais",

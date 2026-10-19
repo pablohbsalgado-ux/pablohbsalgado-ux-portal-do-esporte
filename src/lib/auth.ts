@@ -1,4 +1,4 @@
-// Sessão do painel: cookie "exp.assinatura" assinado com HMAC-SHA256 (ADMIN_SECRET).
+// Sessão do painel: cookie assinado com HMAC-SHA256 (ADMIN_SECRET), um por perfil de acesso.
 // Usa Web Crypto para funcionar tanto no middleware (edge) quanto nas rotas Node.
 
 export const SESSION_COOKIE = "lobo_admin";
@@ -29,20 +29,30 @@ function safeEqual(a: string, b: string) {
   return diff === 0;
 }
 
-export async function createSessionToken() {
+// Token do painel: "perfil.versão.expira.assinatura". A versão muda quando a senha do perfil
+// é trocada; o middleware confere a assinatura e o servidor confere a versão (currentAdmin).
+export async function createSessionToken(userId: string, version: number) {
   const exp = String(Date.now() + SESSION_HOURS * 3_600_000);
-  return `${exp}.${await hmacHex(exp)}`;
+  const payload = `${userId}.${version}.${exp}`;
+  return `${payload}.${await hmacHex(`admin:${payload}`)}`;
+}
+
+/** Confere assinatura e validade; devolve { userId, version } ou null. Funciona no edge. */
+export async function readSessionToken(token: string | undefined) {
+  if (!token) return null;
+  const parts = token.split(".");
+  if (parts.length !== 4) return null;
+  const [userId, version, exp, sig] = parts;
+  if (!/^[a-z_]+$/.test(userId) || !/^\d+$/.test(version) || Number(exp) < Date.now()) return null;
+  try {
+    return safeEqual(sig, await hmacHex(`admin:${userId}.${version}.${exp}`)) ? { userId, version: Number(version) } : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function verifySessionToken(token: string | undefined) {
-  if (!token) return false;
-  const [exp, sig] = token.split(".");
-  if (!exp || !sig || Number(exp) < Date.now()) return false;
-  try {
-    return safeEqual(sig, await hmacHex(exp));
-  } catch {
-    return false;
-  }
+  return (await readSessionToken(token)) !== null;
 }
 
 export async function checkPassword(input: string) {
