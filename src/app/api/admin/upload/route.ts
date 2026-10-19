@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
 import { bad } from "@/lib/admin";
-import { newId, usingSupabase } from "@/lib/store";
+import { newId, supabaseRpc, usingSupabase } from "@/lib/store";
 
 const TYPES: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" };
 const MAX = 5 * 1024 * 1024;
@@ -19,16 +19,18 @@ export async function POST(req: Request) {
   const bytes = Buffer.from(await file.arrayBuffer());
 
   if (usingSupabase()) {
-    const base = process.env.SUPABASE_URL!.replace(/\/$/, "");
-    const bucket = process.env.SUPABASE_BUCKET || "portal";
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-    const res = await fetch(`${base}/storage/v1/object/${bucket}/uploads/${name}`, {
-      method: "POST",
-      headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": file.type },
-      body: bytes,
-    });
-    if (!res.ok) return bad(`Falha no upload (${res.status})`, 502);
-    return NextResponse.json({ url: `${base}/storage/v1/object/public/${bucket}/uploads/${name}` });
+    try {
+      await supabaseRpc("portal_upload_put", {
+        p_token: process.env.SUPABASE_PORTAL_TOKEN,
+        p_name: name,
+        p_mime: file.type,
+        p_b64: bytes.toString("base64"),
+      });
+    } catch (err) {
+      console.error("[upload]", err);
+      return bad("Falha ao salvar a imagem", 502);
+    }
+    return NextResponse.json({ url: `/uploads/${name}` });
   }
 
   const dir = path.join(process.cwd(), "data", "uploads");

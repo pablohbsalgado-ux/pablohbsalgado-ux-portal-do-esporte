@@ -56,11 +56,17 @@ O acesso aos dados passa todo por `src/lib/store.ts`. Escolha o armazenamento pe
 | Modo | Quando usar | Como |
 |---|---|---|
 | `json` (padrão) | VPS ou servidor próprio com disco gravável | Lê e grava os arquivos em `data/*.json`. Fotos enviadas vão para `data/uploads/` |
-| `supabase` | Vercel, Netlify ou outra hospedagem sem disco gravável | Rode `supabase/schema.sql` no Supabase e defina `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`. As fotos vão para o bucket `portal` |
+| `supabase` | Render, Vercel ou outra hospedagem sem disco gravável | Rode `supabase/schema.sql` no Supabase e defina `SUPABASE_URL`, `SUPABASE_KEY` (chave pública) e `SUPABASE_PORTAL_TOKEN` (token gerado pelo script). As fotos também ficam no banco |
 
 Os arquivos em `data/` também funcionam como **conteúdo inicial**: no Supabase, uma coleção que ainda não existe usa o arquivo JSON até o primeiro salvamento.
 
-> ⚠️ Na Vercel o modo `json` **não salva** as alterações, porque o disco é somente leitura. Lá, use `supabase`.
+> ⚠️ No Render e na Vercel o modo `json` **não salva** as alterações de forma permanente. Lá, use `supabase`.
+
+As tabelas do Supabase ficam fechadas: o site só lê e grava pelas funções `portal_*`, que exigem o token secreto. Nunca exponha `SUPABASE_PORTAL_TOKEN` no navegador.
+
+## Publicar no Render
+
+O arquivo `render.yaml` já descreve o serviço. No Render: **New → Blueprint**, escolha este repositório e preencha as variáveis marcadas como secretas (`ADMIN_PASSWORD`, `SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_PORTAL_TOKEN`; e as do Mercado Pago quando for cobrar de verdade). O `ADMIN_SECRET` é gerado automaticamente. Depois do primeiro deploy, coloque o endereço do site em `NEXT_PUBLIC_SITE_URL`.
 
 ---
 

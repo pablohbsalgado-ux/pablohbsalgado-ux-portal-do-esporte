@@ -3,7 +3,7 @@
 // Todo o site lê e grava o conteúdo apenas por aqui, então trocar o "banco"
 // não exige mudar nenhuma página:
 //   CONTENT_STORE=json      → arquivos em ./data (padrão; servidor com disco gravável)
-//   CONTENT_STORE=supabase  → tabela "collections" no Supabase (Vercel/Netlify etc.)
+//   CONTENT_STORE=supabase  → tabela "collections" no Supabase (Render/Vercel etc.)
 // Os arquivos de ./data também servem de conteúdo inicial (seed) para o Supabase.
 
 import { promises as fs } from "fs";
@@ -36,24 +36,34 @@ const jsonAdapter: Adapter = {
   },
 };
 
-function supabaseAdapter(): Adapter {
+/**
+ * Chamada às funções do banco (supabase/schema.sql). As tabelas ficam fechadas
+ * por RLS; leitura e gravação só passam pelas funções, que exigem o token
+ * secreto SUPABASE_PORTAL_TOKEN. Funciona com a chave pública do projeto.
+ */
+export async function supabaseRpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
   const url = process.env.SUPABASE_URL!.replace(/\/$/, "");
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  const headers = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+  const key = process.env.SUPABASE_KEY!;
+  const res = await fetch(`${url}/rest/v1/rpc/${fn}`, {
+    method: "POST",
+    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify(args),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Supabase: falha em ${fn} (${res.status}) ${await res.text()}`);
+  const text = await res.text();
+  return (text ? JSON.parse(text) : null) as T;
+}
+
+function supabaseAdapter(): Adapter {
+  const p_token = process.env.SUPABASE_PORTAL_TOKEN;
   return {
     async read(name) {
-      const res = await fetch(`${url}/rest/v1/collections?name=eq.${name}&select=data`, { headers, cache: "no-store" });
-      if (!res.ok) throw new Error(`Supabase: falha ao ler ${name} (${res.status})`);
-      const rows = (await res.json()) as { data: unknown }[];
-      return rows[0]?.data ?? (await readSeed(name));
+      const data = await supabaseRpc<unknown>("portal_get", { p_token, p_name: name });
+      return data ?? (await readSeed(name));
     },
     async write(name, value) {
-      const res = await fetch(`${url}/rest/v1/collections`, {
-        method: "POST",
-        headers: { ...headers, Prefer: "resolution=merge-duplicates" },
-        body: JSON.stringify({ name, data: value, updated_at: new Date().toISOString() }),
-      });
-      if (!res.ok) throw new Error(`Supabase: falha ao gravar ${name} (${res.status}) ${await res.text()}`);
+      await supabaseRpc("portal_set", { p_token, p_name: name, p_data: value });
     },
   };
 }
@@ -64,8 +74,8 @@ export function usingSupabase() {
 
 function adapter(): Adapter {
   if (usingSupabase()) {
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error("CONTENT_STORE=supabase exige SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY");
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY || !process.env.SUPABASE_PORTAL_TOKEN) {
+      throw new Error("CONTENT_STORE=supabase exige SUPABASE_URL, SUPABASE_KEY e SUPABASE_PORTAL_TOKEN");
     }
     return supabaseAdapter();
   }
