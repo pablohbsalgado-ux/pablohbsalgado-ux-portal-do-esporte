@@ -2,23 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Granulado dos posts da Atlética (ruído SVG leve sobre cores chapadas). */
+:root {
+  --grain-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 @layer base {
   html { scroll-behavior: smooth; }
-  body { @apply bg-lobo-ice text-slate-900 antialiased; }
-  h1, h2, h3 { @apply font-display uppercase tracking-wide; }
-  :focus-visible { @apply outline-none ring-2 ring-lobo-gold ring-offset-2; }
+  body {
+    @apply bg-lobo-paper text-lobo-ink antialiased;
+    background-image: var(--grain-paper);
+    background-size: 220px;
+  }
+  h1, h2, h3 { @apply font-display uppercase; letter-spacing: .01em; }
+  :focus-visible { @apply outline-none ring-2 ring-lobo-red ring-offset-2; }
 }
 
 @layer components {
-  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50; }
-  .btn-gold { @apply btn bg-lobo-gold text-lobo-navy hover:bg-lobo-goldDark; }
-  .btn-navy { @apply btn bg-lobo-navy text-white hover:bg-lobo-blue; }
-  .btn-ghost { @apply btn border border-slate-300 bg-white text-slate-700 hover:border-lobo-navy hover:text-lobo-navy; }
-  .chip { @apply rounded-full border px-3.5 py-1.5 text-sm font-medium transition; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-bold uppercase tracking-wide transition disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-red { @apply btn bg-lobo-red text-white shadow-[3px_3px_0_#17275F] hover:-translate-y-px hover:bg-lobo-redDark; }
+  .btn-navy { @apply btn bg-lobo-navy text-white shadow-[3px_3px_0_#D20C07] hover:-translate-y-px hover:bg-lobo-blue; }
+  .btn-ghost { @apply btn border-2 border-lobo-navy bg-white text-lobo-navy hover:bg-lobo-navy hover:text-white; }
+  .chip { @apply rounded-full border-2 px-3.5 py-1 text-sm font-semibold transition; }
   .chip-on { @apply chip border-lobo-navy bg-lobo-navy text-white; }
-  .chip-off { @apply chip border-slate-300 bg-white text-slate-600 hover:border-lobo-navy hover:text-lobo-navy; }
-  .card { @apply rounded-2xl border border-slate-200 bg-white shadow-sm; }
-  .input { @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-lobo-navy focus:outline-none focus:ring-1 focus:ring-lobo-navy; }
-  .label { @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600; }
-  .section-title { @apply font-display text-3xl uppercase tracking-wide text-lobo-navy sm:text-4xl; }
+  .chip-off { @apply chip border-lobo-navy/25 bg-white text-lobo-navy hover:border-lobo-navy; }
+  .card { @apply rounded-xl border border-lobo-navy/10 bg-white shadow-[0_2px_0_rgba(23,39,95,.08)]; }
+  .input { @apply w-full rounded-md border-2 border-lobo-navy/20 bg-white px-3 py-2 text-sm text-lobo-ink placeholder:text-slate-400 focus:border-lobo-navy focus:outline-none; }
+  .label { @apply mb-1 block text-xs font-bold uppercase tracking-wide text-lobo-navy/70; }
+  .section-title { @apply font-display text-4xl uppercase leading-none text-lobo-navy sm:text-5xl; }
+
+  /* Fundo azul com granulado, como nos posts */
+  .bg-grain-navy { background: var(--grain), #17275F; background-size: 220px, auto; background-blend-mode: soft-light; }
+  .bg-grain-red { background: var(--grain), #D20C07; background-size: 220px, auto; background-blend-mode: soft-light; }
+
+  /* Texto vazado ("O QUE É A") */
+  .text-outline { color: transparent; -webkit-text-stroke: 2px currentColor; }
+  .text-outline-red { color: transparent; -webkit-text-stroke: 2px #D20C07; }
+  .text-outline-white { color: transparent; -webkit-text-stroke: 2px #fff; }
+
+  /* Moldura de selo postal (bordas serrilhadas) */
+  .stamp {
+    --r: 7px;
+    padding: calc(2 * var(--r));
+    -webkit-mask:
+      radial-gradient(var(--r), #0000 97%, #000) round calc(-1.5 * var(--r)) calc(-1.5 * var(--r)) / calc(3 * var(--r)) calc(3 * var(--r)),
+      linear-gradient(#000 0 0) no-repeat 50% / calc(100% - 3 * var(--r)) calc(100% - 3 * var(--r));
+    mask:
+      radial-gradient(var(--r), #0000 97%, #000) round calc(-1.5 * var(--r)) calc(-1.5 * var(--r)) / calc(3 * var(--r)) calc(3 * var(--r)),
+      linear-gradient(#000 0 0) no-repeat 50% / calc(100% - 3 * var(--r)) calc(100% - 3 * var(--r));
+  }
+
+  /* Faixa tricolor (azul / vermelho / branco) usada no rodapé dos posts */
+  .tricolor { background: linear-gradient(90deg, #17275F 0 40%, #D20C07 40% 75%, #fff 75%); }
 }

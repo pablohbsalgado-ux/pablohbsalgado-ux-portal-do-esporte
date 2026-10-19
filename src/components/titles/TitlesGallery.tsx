@@ -7,7 +7,7 @@ import { EmptyState, FilterChips } from "../ui";
 import { IconClose, IconTrophy } from "../icons";
 
 const MEDAL: Record<Placement, string> = {
-  campeao: "bg-lobo-gold text-lobo-navy",
+  campeao: "bg-lobo-red text-white",
   vice: "bg-slate-300 text-slate-800",
   terceiro: "bg-amber-700 text-white",
   destaque: "bg-sky-600 text-white",
@@ -37,10 +37,10 @@ export function TitlesGallery({ titles, modalities }: { titles: Title[]; modalit
 
       {byYear.length === 0 && <div className="mt-8"><EmptyState>Nenhum título nesta modalidade… ainda!</EmptyState></div>}
 
-      <ol className="relative mt-10 space-y-12 border-l-2 border-lobo-gold/50 pl-6 sm:pl-10">
+      <ol className="relative mt-10 space-y-12 border-l-2 border-lobo-red/50 pl-6 sm:pl-10">
         {byYear.map(([year, list]) => (
           <li key={year}>
-            <span className="absolute -left-[13px] mt-1.5 grid h-6 w-6 place-items-center rounded-full bg-lobo-gold text-lobo-navy">
+            <span className="absolute -left-[13px] mt-1.5 grid h-6 w-6 place-items-center rounded-full bg-lobo-red text-white">
               <IconTrophy className="h-3.5 w-3.5" />
             </span>
             <h2 className="font-display text-4xl text-lobo-navy">{year}</h2>
@@ -108,7 +108,7 @@ function TitleModal({ title, onClose }: { title: Title; onClose: () => void }) {
             {photos.length > 1 && (
               <div className="flex gap-2 overflow-x-auto p-2">
                 {photos.map((src, i) => (
-                  <button key={src + i} onClick={() => setIdx(i)} className={`h-14 w-20 flex-none overflow-hidden rounded ${i === idx ? "ring-2 ring-lobo-gold" : "opacity-60"}`} aria-label={`Ver foto ${i + 1}`}>
+                  <button key={src + i} onClick={() => setIdx(i)} className={`h-14 w-20 flex-none overflow-hidden rounded ${i === idx ? "ring-2 ring-lobo-red" : "opacity-60"}`} aria-label={`Ver foto ${i + 1}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="h-full w-full object-cover" />
                   </button>

@@ -26,7 +26,7 @@ function ImageInput({ value, onChange, id }: { value: string; onChange: (v: stri
   return (
     <div className="flex items-start gap-3">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={value || "/img/lobo.svg"} alt="" className={`h-16 w-16 flex-none rounded-lg border bg-lobo-ice object-cover ${value ? "" : "opacity-30"}`} />
+      <img src={value || "/img/logo.png"} alt="" className={`h-16 w-16 flex-none rounded-lg border bg-lobo-paper object-cover ${value ? "" : "opacity-30"}`} />
       <div className="min-w-0 flex-1 space-y-1.5">
         <input id={id} className="input" value={value} onChange={(e) => onChange(e.target.value)} placeholder="URL da imagem ou envie um arquivo" />
         <label className="btn-ghost cursor-pointer px-3 py-1.5 text-xs">

@@ -57,7 +57,7 @@ function Crest({ src, name }: { src: string; name: string }) {
   return (
     <div className="flex w-24 flex-col items-center gap-2 text-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src || "/img/lobo.svg"} alt={`Escudo ${name}`} className="h-16 w-16 object-contain" />
+      <img src={src || "/img/logo.png"} alt={`Escudo ${name}`} className="h-16 w-16 object-contain" />
       <span className="text-xs font-semibold leading-tight">{name}</span>
     </div>
   );
@@ -68,7 +68,7 @@ export function GameCard({ game, today, index = 0 }: { game: Game; today: string
   const home = game.homeAway === "casa";
   return (
     <article className="card animate-rise overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg" style={{ animationDelay: `${index * 60}ms` }}>
-      <div className="flex items-center justify-between bg-lobo-navy px-4 py-2.5 text-white">
+      <div className="bg-grain-navy flex items-center justify-between border-b-4 border-lobo-red px-4 py-2.5 text-white">
         <span className="text-sm font-semibold">
           {game.modality} · {game.category}
         </span>
@@ -77,15 +77,15 @@ export function GameCard({ game, today, index = 0 }: { game: Game; today: string
       <div className="p-5">
         <p className="text-center text-xs font-semibold uppercase tracking-widest text-slate-500">{game.competition}</p>
         <div className="mt-4 flex items-center justify-between">
-          {home ? <Crest src="/img/lobo.svg" name="Lobo" /> : <Crest src={game.opponentLogo} name={game.opponent} />}
+          {home ? <Crest src="/img/logo.png" name="Lobo" /> : <Crest src={game.opponentLogo} name={game.opponent} />}
           <div className="text-center">
             <p className="font-display text-3xl text-lobo-navy">{formatDate(game.date)}</p>
             <p className="text-sm text-slate-500">{weekdayName(game.date)}</p>
-            <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-lobo-ice px-2 py-0.5 text-sm font-bold">
+            <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-lobo-paper px-2 py-0.5 text-sm font-bold">
               <IconClock className="h-4 w-4" /> {game.time}
             </p>
           </div>
-          {home ? <Crest src={game.opponentLogo} name={game.opponent} /> : <Crest src="/img/lobo.svg" name="Lobo" />}
+          {home ? <Crest src={game.opponentLogo} name={game.opponent} /> : <Crest src="/img/logo.png" name="Lobo" />}
         </div>
         <div className="mt-5 flex items-center justify-between gap-3 border-t pt-4">
           <p className="min-w-0 text-sm">
@@ -108,18 +108,18 @@ function ResultRow({ game }: { game: Game }) {
   const outcome = lobo > opp ? { t: "Vitória", c: "bg-emerald-600" } : lobo < opp ? { t: "Derrota", c: "bg-red-600" } : { t: "Empate", c: "bg-slate-500" };
   return (
     <article className="card flex items-center gap-4 p-4">
-      <div className="hidden w-16 flex-none text-center sm:block">
+      <div className="hidden w-20 flex-none whitespace-nowrap text-center sm:block">
         <p className="font-display text-xl text-lobo-navy">{formatDate(game.date)}</p>
         <p className="text-xs text-slate-500">{game.modality}</p>
       </div>
       <div className="flex flex-1 items-center justify-center gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/img/lobo.svg" alt="Lobo" className="h-10 w-10" />
+        <img src="/img/logo.png" alt="Lobo" className="h-10 w-10" />
         <span className="font-display text-4xl tabular-nums text-lobo-navy">
           {game.scoreLobo ?? "–"} <span className="text-slate-300">×</span> {game.scoreOpponent ?? "–"}
         </span>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={game.opponentLogo || "/img/lobo.svg"} alt={game.opponent} className="h-10 w-10 object-contain" />
+        <img src={game.opponentLogo || "/img/logo.png"} alt={game.opponent} className="h-10 w-10 object-contain" />
       </div>
       <div className="flex w-28 flex-none flex-col items-end gap-1 text-right">
         <StatusBadge status="Finalizado" />

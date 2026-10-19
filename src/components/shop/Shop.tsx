@@ -16,12 +16,12 @@ export function PlansSection({ plans }: { plans: Plan[] }) {
       {plans.map((p) => (
         <article
           key={p.id}
-          className={`relative flex flex-col overflow-hidden rounded-2xl p-7 shadow-sm ${p.highlight ? "bg-lobo-navy text-white ring-4 ring-lobo-gold" : "card"}`}
+          className={`relative flex flex-col overflow-hidden rounded-2xl p-7 shadow-sm ${p.highlight ? "bg-grain-navy text-white ring-4 ring-lobo-red" : "card"}`}
         >
           {p.highlight && (
-            <span className="absolute right-5 top-5 rounded-full bg-lobo-gold px-3 py-1 text-xs font-bold uppercase text-lobo-navy">Recomendado</span>
+            <span className="absolute right-5 top-5 rotate-3 bg-lobo-red px-3 py-1 font-display text-sm uppercase tracking-wider text-white">Recomendado</span>
           )}
-          <h3 className={`text-3xl ${p.highlight ? "text-lobo-gold" : "text-lobo-navy"}`}>{p.name}</h3>
+          <h3 className={`text-3xl ${p.highlight ? "text-lobo-redLight" : "text-lobo-navy"}`}>{p.name}</h3>
           <p className={`mt-1 text-sm ${p.highlight ? "text-white/70" : "text-slate-500"}`}>{p.tagline}</p>
           <p className="mt-5 font-display text-5xl">
             {brl(p.price)}
@@ -30,15 +30,15 @@ export function PlansSection({ plans }: { plans: Plan[] }) {
           <ul className="mt-6 flex-1 space-y-2.5">
             {p.benefits.map((b) => (
               <li key={b} className="flex gap-2.5 text-sm">
-                <IconCheck className={`mt-0.5 h-4 w-4 flex-none ${p.highlight ? "text-lobo-gold" : "text-emerald-600"}`} />
+                <IconCheck className={`mt-0.5 h-4 w-4 flex-none ${p.highlight ? "text-lobo-redLight" : "text-lobo-red"}`} />
                 {b}
               </li>
             ))}
           </ul>
           <button
-            className={`${p.highlight ? "btn-gold" : "btn-navy"} mt-7 w-full py-3 text-base`}
+            className={`${p.highlight ? "btn-red" : "btn-navy"} mt-7 w-full py-3 text-base`}
             onClick={() => {
-              cart.add({ kind: "plan", id: p.id, name: `Sócio-Lobo: ${p.name}`, image: "/img/lobo.svg", price: p.price });
+              cart.add({ kind: "plan", id: p.id, name: `Sócio-Lobo: ${p.name}`, image: "/img/logo.png", price: p.price });
               cart.setOpen(false);
               cart.setCheckoutOpen(true);
             }}
@@ -83,10 +83,10 @@ function ProductCard({ product: p }: { product: Product }) {
 
   return (
     <article className="card group flex flex-col overflow-hidden">
-      <div className="relative aspect-square overflow-hidden bg-lobo-ice">
+      <div className="relative aspect-square overflow-hidden bg-lobo-paper">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={p.image || "/img/lobo.svg"} alt={p.name} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-        {p.badge && !soldOut && <span className="absolute left-3 top-3 rounded-full bg-lobo-gold px-2.5 py-1 text-xs font-bold uppercase text-lobo-navy">{p.badge}</span>}
+        <img src={p.image || "/img/logo.png"} alt={p.name} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+        {p.badge && !soldOut && <span className="absolute left-3 top-3 rounded-full bg-lobo-red px-2.5 py-1 text-xs font-bold uppercase text-white">{p.badge}</span>}
         {soldOut && <span className="absolute inset-0 grid place-items-center bg-white/70 font-display text-2xl uppercase text-slate-700">Esgotado</span>}
         {!soldOut && p.stock <= 5 && <span className="absolute bottom-3 left-3 rounded bg-red-600 px-2 py-0.5 text-xs font-bold text-white">Últimas {p.stock} un.</span>}
       </div>
@@ -145,7 +145,7 @@ export function CustomizationForm({ models, extraPrice }: { models: Product[]; e
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
-      <div className="relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-2xl bg-lobo-ice">
+      <div className="relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-2xl bg-lobo-paper">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/img/camisa-costas.svg" alt={`${model.name} — costas`} className="h-full w-full object-cover" />
         <div className="absolute inset-x-0 top-[27%] text-center font-display uppercase text-white" style={{ textShadow: "0 0 3px #0B1F3A, 0 2px 6px rgba(0,0,0,.5)" }}>
@@ -198,12 +198,12 @@ export function CustomizationForm({ models, extraPrice }: { models: Product[]; e
             ))}
           </div>
         </div>
-        <div className="flex items-center justify-between rounded-lg bg-lobo-ice p-3 text-sm">
+        <div className="flex items-center justify-between rounded-lg bg-lobo-paper p-3 text-sm">
           <span>Camisa {brl(model.price)} + personalização {brl(extraPrice)}</span>
           <strong className="text-lg text-lobo-navy">{brl(price)}</strong>
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
-        <button className="btn-gold w-full py-3 text-base">Adicionar uniforme personalizado</button>
+        <button className="btn-red w-full py-3 text-base">Adicionar uniforme personalizado</button>
       </form>
     </div>
   );

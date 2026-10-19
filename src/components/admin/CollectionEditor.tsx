@@ -79,7 +79,7 @@ export function CollectionEditor({ name, initial, modalities }: { name: Collecti
     <>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <input className="input sm:max-w-xs" placeholder="Buscar…" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Buscar" />
-        <button className="btn-gold" onClick={() => { setErrors([]); setEditing({ id: null, values: emptyRecord(spec.fields) }); }}>
+        <button className="btn-red" onClick={() => { setErrors([]); setEditing({ id: null, values: emptyRecord(spec.fields) }); }}>
           + Novo {spec.singular}
         </button>
       </div>

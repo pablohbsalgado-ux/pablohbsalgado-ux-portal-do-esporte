@@ -20,12 +20,12 @@
   },
   {
     "id": "p2",
-    "name": "Camisa de Jogo Reserva (Dourada)",
+    "name": "Camisa de Jogo Reserva (Vermelha)",
     "description": "Modelo reserva, tecido leve e respirável.",
     "category": "Uniformes",
     "price": 109.9,
     "compareAtPrice": null,
-    "image": "/img/produto-camisa-gold.svg",
+    "image": "/img/produto-camisa-red.svg",
     "badge": "Lançamento",
     "sizes": [
       "P",
@@ -92,7 +92,7 @@
   {
     "id": "p6",
     "name": "Tirante de Crachá",
-    "description": "Tirante bordado azul e dourado.",
+    "description": "Tirante bordado azul e vermelho.",
     "category": "Acessórios",
     "price": 19.9,
     "compareAtPrice": null,

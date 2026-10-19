@@ -1,17 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Oswald } from "next/font/google";
+import { Anton, Archivo } from "next/font/google";
 import "./globals.css";
 
-const display = Oswald({ subsets: ["latin"], variable: "--font-display", weight: ["500", "600", "700"] });
-const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const display = Anton({ subsets: ["latin"], variable: "--font-display", weight: "400" });
+const sans = Archivo({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: { default: "Portal do Esporte — Atlética Lobo", template: "%s | Portal do Esporte — Atlética Lobo" },
-  description: "Jogos, escala de treinos, loja oficial, Sócio-Lobo e galeria de títulos da Atlética Lobo.",
-  icons: { icon: "/img/lobo.svg" },
-};
+  title: { default: "Portal do Lobo — A.A.A. CEFET/RJ", template: "%s | Portal do Lobo — A.A.A. CEFET/RJ" },
+  description: "Jogos, escala de treinos, loja oficial, Sócio-Lobo e galeria de títulos da Atlética CEFET-RJ.",
+  };
 
-export const viewport: Viewport = { themeColor: "#0B1F3A" };
+export const viewport: Viewport = { themeColor: "#17275F" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

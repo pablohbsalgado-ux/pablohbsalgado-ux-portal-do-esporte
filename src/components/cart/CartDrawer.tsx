@@ -25,7 +25,7 @@ export function CartDrawer() {
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Carrinho">
       <button className="absolute inset-0 bg-black/50" aria-label="Fechar carrinho" onClick={() => cart.setOpen(false)} />
       <aside className="absolute right-0 top-0 flex h-full w-full max-w-md animate-slidein flex-col bg-white shadow-2xl">
-        <header className="flex items-center justify-between bg-lobo-navy px-5 py-4 text-white">
+        <header className="bg-grain-navy flex items-center justify-between border-b-4 border-lobo-red px-5 py-4 text-white">
           <h2 className="text-2xl">Seu carrinho</h2>
           <button onClick={() => cart.setOpen(false)} aria-label="Fechar" className="rounded p-1 hover:bg-white/10">
             <IconClose />
@@ -35,7 +35,7 @@ export function CartDrawer() {
         {cart.items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center text-slate-500">
             <p>Seu carrinho está vazio.</p>
-            <a href="/vendas" className="btn-gold" onClick={() => cart.setOpen(false)}>Ir para a loja</a>
+            <a href="/vendas" className="btn-red" onClick={() => cart.setOpen(false)}>Ir para a loja</a>
           </div>
         ) : (
           <>
@@ -43,7 +43,7 @@ export function CartDrawer() {
               {cart.items.map((item) => (
                 <li key={item.key} className="flex gap-3 py-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.image || "/img/lobo.svg"} alt="" className="h-20 w-20 flex-none rounded-lg bg-lobo-ice object-cover" />
+                  <img src={item.image || "/img/logo.png"} alt="" className="h-20 w-20 flex-none rounded-lg bg-lobo-paper object-cover" />
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold leading-tight">{item.name}</p>
                     <p className="mt-0.5 text-xs text-slate-500">
@@ -59,7 +59,7 @@ export function CartDrawer() {
                           <button className="px-2.5 py-1" aria-label="Aumentar" onClick={() => cart.setQuantity(item.key, item.quantity + 1)}>+</button>
                         </div>
                       ) : (
-                        <span className="text-xs font-semibold uppercase text-lobo-goldDark">Adesão de sócio</span>
+                        <span className="text-xs font-semibold uppercase text-lobo-redDark">Adesão de sócio</span>
                       )}
                       <span className="font-semibold">{brl(item.price * item.quantity)}</span>
                     </div>
@@ -76,7 +76,7 @@ export function CartDrawer() {
                 <strong>{brl(cart.subtotal)}</strong>
               </div>
               <button
-                className="btn-gold w-full py-3 text-base"
+                className="btn-red w-full py-3 text-base"
                 onClick={() => {
                   cart.setOpen(false);
                   cart.setCheckoutOpen(true);

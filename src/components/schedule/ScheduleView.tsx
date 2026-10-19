@@ -13,8 +13,8 @@ const SLOT = 30; // minutos por linha
 const SLOT_PX = 44;
 
 const PALETTE = [
-  "border-l-lobo-gold bg-amber-50",
-  "border-l-sky-500 bg-sky-50",
+  "border-l-lobo-red bg-red-50",
+  "border-l-lobo-navy bg-indigo-50",
   "border-l-emerald-500 bg-emerald-50",
   "border-l-rose-500 bg-rose-50",
   "border-l-violet-500 bg-violet-50",
@@ -57,10 +57,10 @@ export function ScheduleView({ trainings, modalities, todayDay }: { trainings: T
       {/* Desktop: matriz dias × horários */}
       {total > 0 && (
         <div className="card mt-8 hidden overflow-hidden md:block">
-          <div className="grid grid-cols-[64px_repeat(6,minmax(0,1fr))] border-b bg-lobo-navy text-white">
+          <div className="grid grid-cols-[64px_repeat(6,minmax(0,1fr))] border-b-4 border-lobo-red bg-grain-navy text-white">
             <div />
             {WEEK_DAYS.map((d) => (
-              <div key={d.value} className={`px-2 py-3 text-center font-display uppercase tracking-wider ${todayDay === d.value ? "bg-lobo-gold text-lobo-navy" : ""}`}>
+              <div key={d.value} className={`px-2 py-3 text-center font-display uppercase tracking-wider ${todayDay === d.value ? "bg-lobo-red text-white" : ""}`}>
                 {d.label}
               </div>
             ))}
@@ -80,7 +80,7 @@ export function ScheduleView({ trainings, modalities, todayDay }: { trainings: T
               return (
                 <div
                   key={d.value}
-                  className={`relative border-l ${todayDay === d.value ? "bg-amber-50/40" : ""}`}
+                  className={`relative border-l ${todayDay === d.value ? "bg-red-50/50" : ""}`}
                   style={{
                     height: rows * SLOT_PX,
                     backgroundImage: `repeating-linear-gradient(to bottom, transparent 0 ${SLOT_PX * 2 - 1}px, #e2e8f0 ${SLOT_PX * 2 - 1}px ${SLOT_PX * 2}px)`,
@@ -128,7 +128,7 @@ export function ScheduleView({ trainings, modalities, todayDay }: { trainings: T
                 <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3.5">
                   <span className="font-display text-lg uppercase tracking-wider text-lobo-navy">
                     {d.label}
-                    {todayDay === d.value && <span className="ml-2 rounded bg-lobo-gold px-1.5 py-0.5 align-middle text-[10px] font-bold">HOJE</span>}
+                    {todayDay === d.value && <span className="ml-2 rounded bg-lobo-red px-1.5 py-0.5 align-middle text-[10px] font-bold">HOJE</span>}
                   </span>
                   <span className="flex items-center gap-2 text-sm text-slate-500">
                     {list.length} {list.length === 1 ? "treino" : "treinos"}

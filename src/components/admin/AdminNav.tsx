@@ -21,7 +21,7 @@ export function AdminNav() {
       {LINKS.map((l) => {
         const active = l.href === "/admin" ? pathname === "/admin" : pathname.startsWith(l.href);
         return (
-          <Link key={l.href} href={l.href} className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium ${active ? "bg-lobo-gold text-lobo-navy" : "text-white/80 hover:bg-white/10"}`}>
+          <Link key={l.href} href={l.href} className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium ${active ? "bg-lobo-red text-white" : "text-white/80 hover:bg-white/10"}`}>
             {l.label}
           </Link>
         );

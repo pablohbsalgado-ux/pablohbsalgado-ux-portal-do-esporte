@@ -12,10 +12,10 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       <aside className="bg-lobo-navy text-white md:sticky md:top-0 md:h-screen">
         <div className="flex items-center gap-2 px-5 py-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/img/lobo.svg" alt="" className="h-9 w-9" />
+          <img src="/img/logo.png" alt="" className="h-9 w-9" />
           <div>
             <p className="font-display uppercase leading-none tracking-wider">Painel Lobo</p>
-            <Link href="/" target="_blank" className="text-xs text-white/60 hover:text-lobo-gold">Ver site ↗</Link>
+            <Link href="/" target="_blank" className="text-xs text-white/60 hover:text-lobo-red">Ver site ↗</Link>
           </div>
         </div>
         <AdminNav />
@@ -24,7 +24,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           <p>Pagamentos: {paymentsDemoMode() ? "modo demonstração" : "Mercado Pago ativo"}</p>
         </div>
       </aside>
-      <div className="min-w-0 bg-lobo-ice">{children}</div>
+      <div className="min-w-0 bg-lobo-paper">{children}</div>
     </div>
   );
 }

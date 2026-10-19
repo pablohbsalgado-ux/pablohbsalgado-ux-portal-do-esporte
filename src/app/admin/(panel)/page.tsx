@@ -33,7 +33,7 @@ export default async function AdminHome() {
 
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((s) => (
-          <Link key={s.l} href={s.href} className="card p-4 hover:border-lobo-gold">
+          <Link key={s.l} href={s.href} className="card p-4 hover:border-lobo-red">
             <p className="font-display text-3xl text-lobo-navy">{s.n}</p>
             <p className="text-xs text-slate-500">{s.l}</p>
           </Link>

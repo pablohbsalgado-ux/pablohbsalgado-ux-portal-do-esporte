@@ -73,7 +73,7 @@ export function OrderStatusPanel({
           <div className="flex gap-2">
             <input id="pix-code" readOnly value={pix.copyPaste} className="input font-mono text-xs" onFocus={(e) => e.target.select()} />
             <button
-              className="btn-gold flex-none"
+              className="btn-red flex-none"
               onClick={async () => {
                 await navigator.clipboard.writeText(pix.copyPaste);
                 setCopied(true);
@@ -92,7 +92,7 @@ export function OrderStatusPanel({
         </>
       )}
       <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
-        <span className="h-2 w-2 animate-ping rounded-full bg-lobo-gold" /> Aguardando pagamento…
+        <span className="h-2 w-2 animate-ping rounded-full bg-lobo-red" /> Aguardando pagamento…
       </p>
       {demo && (
         <button

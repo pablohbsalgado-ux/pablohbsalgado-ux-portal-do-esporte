@@ -1,25 +1,52 @@
 import type { DisplayStatus } from "@/lib/format";
 
-export function PageHero({ kicker, title, children }: { kicker: string; title: string; children?: React.ReactNode }) {
+/** Estrela "explosão" de 8 pontas dos posts da Atlética. */
+export function Star({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
   return (
-    <section className="relative overflow-hidden bg-lobo-navy text-white">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-lobo-gold/10" />
-      <div className="pointer-events-none absolute -bottom-32 right-40 h-64 w-64 rounded-full bg-lobo-blue/60" />
-      <div className="relative mx-auto max-w-7xl px-4 py-12 sm:py-16">
-        <p className="font-display text-sm uppercase tracking-[0.3em] text-lobo-gold">{kicker}</p>
-        <h1 className="mt-2 text-4xl sm:text-6xl">{title}</h1>
-        {children && <div className="mt-3 max-w-2xl text-white/75">{children}</div>}
+    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+      <path
+        fill={color}
+        d="M50 0l7 36 28-24-17 33 32 5-32 6 17 32-28-23-7 35-7-35-28 23 17-32-32-6 32-5L15 12l28 24z"
+      />
+    </svg>
+  );
+}
+
+/** Rabiscos de giz vermelhos (detalhe dos posts). */
+export function Scribble({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 60" className={className} aria-hidden="true" fill="none" stroke="#D20C07" strokeWidth="5" strokeLinecap="round">
+      <path d="M8 50L40 8M30 54L62 12M52 56L84 14M74 56l30-38" />
+    </svg>
+  );
+}
+
+export function PageHero({ kicker, title, children }: { kicker: string; title: string; children?: React.ReactNode }) {
+  const [first, ...rest] = title.split(" ");
+  return (
+    <section className="bg-grain-navy relative overflow-hidden text-white">
+      <Star className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 animate-spinslow text-lobo-blue" />
+      <Star className="pointer-events-none absolute bottom-6 right-32 hidden h-14 w-14 text-lobo-red sm:block" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/img/logo.png" alt="" className="pointer-events-none absolute right-6 top-1/2 hidden h-40 w-40 -translate-y-1/2 opacity-90 md:block lg:right-24 lg:h-48 lg:w-48" />
+      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-10 sm:pb-20 sm:pt-14">
+        <p className="inline-block -rotate-1 bg-lobo-red px-3 py-1 font-display text-sm uppercase tracking-[0.2em]">{kicker}</p>
+        <h1 className="mt-4 text-5xl leading-[0.9] sm:text-7xl">
+          <span className="text-outline-white">{first}</span> {rest.join(" ")}
+        </h1>
+        {children && <div className="mt-4 max-w-xl text-white/80">{children}</div>}
       </div>
+      <div className="tricolor absolute inset-x-0 bottom-0 h-2" />
     </section>
   );
 }
 
 const STATUS_STYLE: Record<DisplayStatus, string> = {
-  Agendado: "bg-slate-100 text-slate-700",
-  "Em Breve": "bg-amber-100 text-amber-800",
-  Hoje: "bg-lobo-gold text-lobo-navy animate-pulse",
-  "Em Andamento": "bg-red-600 text-white",
-  Finalizado: "bg-lobo-navy text-white",
+  Agendado: "bg-white text-lobo-navy",
+  "Em Breve": "bg-lobo-blue text-white",
+  Hoje: "bg-lobo-red text-white ring-2 ring-white",
+  "Em Andamento": "bg-lobo-red text-white",
+  Finalizado: "bg-lobo-ink text-white",
   Adiado: "bg-orange-100 text-orange-800 line-through",
 };
 

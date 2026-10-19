@@ -89,7 +89,7 @@ export function CheckoutModal() {
               ["pix", "Pix", "QR Code na hora, aprovação imediata"],
               ["card", "Cartão de crédito", "Até 6x, ambiente seguro Mercado Pago"],
             ] as const).map(([value, title, sub]) => (
-              <label key={value} className={`cursor-pointer rounded-xl border-2 p-3 transition ${method === value ? "border-lobo-navy bg-lobo-ice" : "border-slate-200"}`}>
+              <label key={value} className={`cursor-pointer rounded-xl border-2 p-3 transition ${method === value ? "border-lobo-navy bg-lobo-paper" : "border-slate-200"}`}>
                 <input type="radio" name="method" value={value} checked={method === value} onChange={() => setMethod(value)} className="sr-only" />
                 <span className="block font-semibold">{title}</span>
                 <span className="block text-xs text-slate-500">{sub}</span>
@@ -100,7 +100,7 @@ export function CheckoutModal() {
 
         {error && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
-        <button disabled={busy} className="btn-gold mt-6 w-full py-3 text-base">
+        <button disabled={busy} className="btn-red mt-6 w-full py-3 text-base">
           {busy ? "Processando…" : method === "pix" ? `Gerar Pix de ${brl(cart.subtotal)}` : `Pagar ${brl(cart.subtotal)} com cartão`}
         </button>
         <p className="mt-2 text-center text-xs text-slate-500">O valor final é confirmado pelo servidor com os preços atuais da loja.</p>

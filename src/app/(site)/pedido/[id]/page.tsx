@@ -13,7 +13,7 @@ export default async function PedidoPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <p className="font-display text-sm uppercase tracking-[0.3em] text-lobo-goldDark">Pedido {order.id}</p>
+      <p className="font-display text-sm uppercase tracking-[0.3em] text-lobo-redDark">Pedido {order.id}</p>
       <h1 className="mt-1 text-4xl text-lobo-navy">Obrigado, {order.customer.name.split(" ")[0]}!</h1>
 
       <div className="mt-8 grid gap-6 md:grid-cols-[1fr_280px]">

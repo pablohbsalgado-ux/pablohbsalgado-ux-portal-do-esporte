@@ -13,7 +13,7 @@ const NAV = [
   { href: "/titulos", label: "Títulos" },
 ];
 
-export function Header({ announcement }: { announcement?: string }) {
+export function Header({ announcement, siteName }: { announcement?: string; siteName: string }) {
   const pathname = usePathname();
   const cart = useCart();
   const [menu, setMenu] = useState(false);
@@ -21,15 +21,16 @@ export function Header({ announcement }: { announcement?: string }) {
   return (
     <header className="sticky top-0 z-40">
       {announcement && (
-        <div className="bg-lobo-gold px-4 py-1.5 text-center text-xs font-semibold text-lobo-navy sm:text-sm">{announcement}</div>
+        <div className="bg-grain-red px-4 py-1.5 text-center text-xs font-bold uppercase tracking-wide text-white sm:text-sm">{announcement}</div>
       )}
-      <div className="border-b border-white/10 bg-lobo-navy/95 text-white backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
+      <div className="bg-grain-navy border-b-4 border-lobo-red text-white">
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:h-[72px]">
           <Link href="/" className="flex items-center gap-2.5" onClick={() => setMenu(false)}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/lobo.svg" alt="" className="h-10 w-10" />
-            <span className="font-display text-xl uppercase leading-none tracking-wider">
-              Portal do <span className="text-lobo-gold">Esporte</span>
+            <img src="/img/logo.png" alt="Atlética CEFET-RJ" className="h-11 w-11 sm:h-14 sm:w-14" />
+            <span className="leading-none">
+              <span className="block font-display text-xl uppercase sm:text-2xl">{siteName}</span>
+              <span className="block text-[10px] font-bold uppercase tracking-[0.25em] text-white/60">A.A.A. CEFET/RJ</span>
             </span>
           </Link>
 
@@ -41,10 +42,10 @@ export function Header({ announcement }: { announcement?: string }) {
                   key={n.href}
                   href={n.href}
                   aria-current={active ? "page" : undefined}
-                  className={`rounded-md px-4 py-2 font-display text-lg uppercase tracking-wider transition ${active ? "text-lobo-gold" : "text-white/85 hover:text-white"}`}
+                  className={`px-4 py-2 font-display text-xl uppercase tracking-wide transition ${active ? "text-white" : "text-white/70 hover:text-white"}`}
                 >
                   {n.label}
-                  <span className={`mx-auto mt-0.5 block h-0.5 rounded bg-lobo-gold transition-all ${active ? "w-full" : "w-0"}`} />
+                  <span className={`mx-auto mt-0.5 block h-1 -skew-x-12 bg-lobo-red transition-all ${active ? "w-full" : "w-0"}`} />
                 </Link>
               );
             })}
@@ -57,7 +58,7 @@ export function Header({ announcement }: { announcement?: string }) {
           >
             <IconCart className="h-6 w-6" />
             {cart.count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-lobo-gold px-1 text-xs font-bold text-lobo-navy">
+              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-lobo-red px-1 text-xs font-bold text-white">
                 {cart.count}
               </span>
             )}
@@ -74,7 +75,7 @@ export function Header({ announcement }: { announcement?: string }) {
                 key={n.href}
                 href={n.href}
                 onClick={() => setMenu(false)}
-                className={`block border-b border-white/10 py-3 font-display text-xl uppercase tracking-wider ${pathname.startsWith(n.href) ? "text-lobo-gold" : ""}`}
+                className={`block border-b border-white/10 py-3 font-display text-xl uppercase tracking-wider ${pathname.startsWith(n.href) ? "text-lobo-redLight" : ""}`}
               >
                 {n.label}
               </Link>

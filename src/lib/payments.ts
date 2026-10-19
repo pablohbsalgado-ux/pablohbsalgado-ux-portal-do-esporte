@@ -36,7 +36,7 @@ export type CheckoutResult =
   | { kind: "redirect"; paymentId: string; url: string };
 
 export async function startPayment(order: Order): Promise<CheckoutResult> {
-  const description = `Atlética Lobo — pedido ${order.id}`;
+  const description = `Atlética CEFET-RJ — pedido ${order.id}`;
   const expiresAt = new Date(Date.now() + 30 * 60_000).toISOString();
 
   if (paymentsDemoMode()) {
@@ -83,7 +83,7 @@ export async function startPayment(order: Order): Promise<CheckoutResult> {
     body: JSON.stringify({
       external_reference: order.id,
       notification_url: notificationUrl,
-      statement_descriptor: "ATLETICA LOBO",
+      statement_descriptor: "ATLETICA CEFETRJ",
       payer: { name: firstName, surname: rest.join(" "), email: order.customer.email },
       items: order.items.map((i) => ({
         id: i.refId,
