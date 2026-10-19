@@ -1,0 +1,7 @@
+[
+  { "id": "ti1", "championship": "Liga Universitária Carioca", "year": 2025, "modality": "Futsal", "category": "Masculino", "placement": "campeao", "description": "Campanha invicta com 7 vitórias e 1 empate. Final vencida por 3 a 1 contra a Atlética Pantera.", "cover": "/img/titulo-1.svg", "photos": ["/img/titulo-1.svg", "/img/titulo-2.svg", "/img/titulo-3.svg"] },
+  { "id": "ti2", "championship": "Copa Interatléticas", "year": 2025, "modality": "Vôlei", "category": "Feminino", "placement": "campeao", "description": "Bicampeonato! Final decidida no tie-break.", "cover": "/img/titulo-2.svg", "photos": ["/img/titulo-2.svg", "/img/titulo-1.svg"] },
+  { "id": "ti3", "championship": "Jogos Universitários do Rio", "year": 2024, "modality": "Basquete", "category": "Masculino", "placement": "vice", "description": "Vice-campeonato após prorrogação na final.", "cover": "/img/titulo-3.svg", "photos": ["/img/titulo-3.svg"] },
+  { "id": "ti4", "championship": "Copa Interatléticas", "year": 2024, "modality": "Vôlei", "category": "Feminino", "placement": "campeao", "description": "Primeiro título da equipe feminina de vôlei.", "cover": "/img/titulo-1.svg", "photos": ["/img/titulo-1.svg"] },
+  { "id": "ti5", "championship": "Torneio de Calouros", "year": 2023, "modality": "Handebol", "category": "Masculino", "placement": "terceiro", "description": "Bronze na estreia do time de handebol.", "cover": "/img/titulo-2.svg", "photos": ["/img/titulo-2.svg"] }
+]

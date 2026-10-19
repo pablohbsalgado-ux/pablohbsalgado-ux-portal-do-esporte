@@ -1,0 +1,13 @@
+[
+  { "id": "t1", "modality": "Futsal", "category": "Masculino", "day": "seg", "start": "18:00", "end": "20:00", "court": "Quadra 1 — CEFET", "address": "Av. Maracanã, 229 - Maracanã, Rio de Janeiro - RJ", "coach": "Prof. Marcos" },
+  { "id": "t2", "modality": "Vôlei", "category": "Feminino", "day": "seg", "start": "20:00", "end": "22:00", "court": "Quadra 1 — CEFET", "address": "Av. Maracanã, 229 - Maracanã, Rio de Janeiro - RJ", "coach": "Profa. Júlia" },
+  { "id": "t3", "modality": "Basquete", "category": "Masculino", "day": "ter", "start": "17:00", "end": "19:00", "court": "Quadra 2 — CEFET", "address": "Av. Maracanã, 229 - Maracanã, Rio de Janeiro - RJ", "coach": "Prof. Renato" },
+  { "id": "t4", "modality": "Handebol", "category": "Feminino", "day": "ter", "start": "19:00", "end": "21:00", "court": "Quadra 2 — CEFET", "address": "Av. Maracanã, 229 - Maracanã, Rio de Janeiro - RJ", "coach": "Profa. Bia" },
+  { "id": "t5", "modality": "Futsal", "category": "Feminino", "day": "qua", "start": "18:00", "end": "20:00", "court": "Quadra 1 — CEFET", "address": "Av. Maracanã, 229 - Maracanã, Rio de Janeiro - RJ", "coach": "Prof. Marcos" },
+  { "id": "t6", "modality": "Vôlei", "category": "Masculino", "day": "qua", "start": "18:00", "end": "19:30", "court": "Quadra 2 — CEFET", "address": "Av. Maracanã, 229 - Maracanã, Rio de Janeiro - RJ", "coach": "Profa. Júlia" },
+  { "id": "t7", "modality": "Handebol", "category": "Masculino", "day": "qui", "start": "19:00", "end": "21:00", "court": "Quadra 1 — CEFET", "address": "Av. Maracanã, 229 - Maracanã, Rio de Janeiro - RJ", "coach": "Profa. Bia" },
+  { "id": "t8", "modality": "Basquete", "category": "Feminino", "day": "qui", "start": "17:00", "end": "18:30", "court": "Quadra 2 — CEFET", "address": "Av. Maracanã, 229 - Maracanã, Rio de Janeiro - RJ", "coach": "Prof. Renato" },
+  { "id": "t9", "modality": "Futsal", "category": "Masculino", "day": "sex", "start": "19:00", "end": "21:00", "court": "Quadra 1 — CEFET", "address": "Av. Maracanã, 229 - Maracanã, Rio de Janeiro - RJ", "coach": "Prof. Marcos" },
+  { "id": "t10", "modality": "Futebol de Campo", "category": "Masculino", "day": "sab", "start": "17:00", "end": "19:00", "court": "Campo do Maracanãzinho", "address": "Maracanãzinho, Rio de Janeiro - RJ", "coach": "Prof. Carlos" },
+  { "id": "t11", "modality": "Vôlei", "category": "Feminino", "day": "sab", "start": "19:00", "end": "21:00", "court": "Quadra 1 — CEFET", "address": "Av. Maracanã, 229 - Maracanã, Rio de Janeiro - RJ", "coach": "Profa. Júlia" }
+]

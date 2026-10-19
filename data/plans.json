@@ -1,0 +1,4 @@
+[
+  { "id": "socio-atleta", "name": "Sócio Atleta", "tagline": "Para quem veste a camisa dentro de quadra.", "price": 120, "period": "semestral", "benefits": ["Treinos de todas as modalidades no CEFET", "Inscrição nas competições oficiais", "Seguro atleta durante os jogos", "Todos os benefícios do Sócio Torcedor"], "highlight": true, "active": true },
+  { "id": "socio-torcedor", "name": "Sócio Torcedor", "tagline": "Para quem ruge na arquibancada.", "price": 60, "period": "semestral", "benefits": ["15% de desconto na loja oficial", "Ingressos com desconto nas festas e jogos", "Prioridade na compra de lotes", "Carteirinha digital de sócio"], "highlight": false, "active": true }
+]

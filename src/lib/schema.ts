@@ -1,0 +1,266 @@
+// Definição declarativa dos campos de cada coleção.
+// A MESMA definição gera os formulários do painel /admin e valida os dados no servidor:
+// para adicionar um campo novo basta incluí-lo aqui (e no tipo em ./types.ts).
+
+import type { CollectionName } from "./types";
+
+export type FieldType =
+  | "text"
+  | "textarea"
+  | "number"
+  | "money"
+  | "date"
+  | "time"
+  | "select"
+  | "boolean"
+  | "image"
+  | "images"
+  | "list";
+
+export interface FieldSpec {
+  key: string;
+  label: string;
+  type: FieldType;
+  required?: boolean;
+  nullable?: boolean; // number/money que podem ficar vazios (ex.: placar de jogo futuro)
+  options?: { value: string; label: string }[];
+  optionsFrom?: "modalities"; // opções dinâmicas vindas das Configurações
+  help?: string;
+  min?: number;
+  default?: unknown;
+  half?: boolean; // ocupa meia largura no formulário
+}
+
+export interface CollectionSpec {
+  name: CollectionName;
+  label: string;
+  singular: string;
+  singleton?: boolean;
+  readOnly?: boolean;
+  fields: FieldSpec[];
+  // campos exibidos na listagem do painel
+  columns: string[];
+  sortBy?: { key: string; dir: "asc" | "desc" };
+}
+
+const categories = [
+  { value: "Masculino", label: "Masculino" },
+  { value: "Feminino", label: "Feminino" },
+  { value: "Misto", label: "Misto" },
+];
+
+export const WEEK_DAYS = [
+  { value: "seg", label: "Segunda" },
+  { value: "ter", label: "Terça" },
+  { value: "qua", label: "Quarta" },
+  { value: "qui", label: "Quinta" },
+  { value: "sex", label: "Sexta" },
+  { value: "sab", label: "Sábado" },
+] as const;
+
+export const PLACEMENTS = [
+  { value: "campeao", label: "Campeão" },
+  { value: "vice", label: "Vice-campeão" },
+  { value: "terceiro", label: "3º lugar" },
+  { value: "destaque", label: "Destaque" },
+];
+
+export const GAME_STATUSES = [
+  { value: "auto", label: "Automático (pela data)" },
+  { value: "agendado", label: "Agendado" },
+  { value: "em_andamento", label: "Em andamento" },
+  { value: "finalizado", label: "Finalizado" },
+  { value: "adiado", label: "Adiado" },
+];
+
+export const SPECS: Record<CollectionName, CollectionSpec> = {
+  games: {
+    name: "games",
+    label: "Jogos e placares",
+    singular: "jogo",
+    columns: ["date", "time", "modality", "category", "opponent", "status", "scoreLobo", "scoreOpponent"],
+    sortBy: { key: "date", dir: "desc" },
+    fields: [
+      { key: "modality", label: "Modalidade", type: "select", optionsFrom: "modalities", required: true, half: true },
+      { key: "category", label: "Categoria", type: "select", options: categories, required: true, half: true, default: "Masculino" },
+      { key: "competition", label: "Competição", type: "text", help: "Ex.: Jogos Universitários 2026" },
+      { key: "opponent", label: "Adversário", type: "text", required: true, half: true },
+      { key: "opponentLogo", label: "Escudo do adversário", type: "image", half: true },
+      { key: "date", label: "Data", type: "date", required: true, half: true },
+      { key: "time", label: "Horário", type: "time", required: true, half: true },
+      { key: "location", label: "Local (nome)", type: "text", required: true, help: "Ex.: Ginásio do CEFET" },
+      { key: "address", label: "Endereço para o mapa", type: "text", help: "Usado no botão “Ver no mapa”. Se vazio, usa o nome do local." },
+      { key: "homeAway", label: "Mando", type: "select", options: [{ value: "casa", label: "Em casa" }, { value: "fora", label: "Fora" }], default: "casa", half: true },
+      { key: "status", label: "Status", type: "select", options: GAME_STATUSES, default: "auto", half: true, help: "“Automático” mostra Agendado / Em breve / Hoje conforme a data." },
+      { key: "scoreLobo", label: "Placar Lobo", type: "number", nullable: true, min: 0, half: true },
+      { key: "scoreOpponent", label: "Placar adversário", type: "number", nullable: true, min: 0, half: true },
+      { key: "notes", label: "Observações", type: "textarea" },
+    ],
+  },
+  trainings: {
+    name: "trainings",
+    label: "Escala de treinos",
+    singular: "treino",
+    columns: ["day", "start", "end", "modality", "category", "court"],
+    fields: [
+      { key: "modality", label: "Modalidade", type: "select", optionsFrom: "modalities", required: true, half: true },
+      { key: "category", label: "Categoria", type: "select", options: categories, required: true, half: true, default: "Masculino" },
+      { key: "day", label: "Dia da semana", type: "select", options: [...WEEK_DAYS], required: true },
+      { key: "start", label: "Início", type: "time", required: true, half: true, help: "Grade: 17:00 às 22:00" },
+      { key: "end", label: "Fim", type: "time", required: true, half: true },
+      { key: "court", label: "Quadra / local", type: "text", required: true },
+      { key: "address", label: "Endereço para o mapa", type: "text" },
+      { key: "coach", label: "Técnico / responsável", type: "text" },
+    ],
+  },
+  products: {
+    name: "products",
+    label: "Produtos e estoque",
+    singular: "produto",
+    columns: ["name", "category", "price", "stock", "badge", "active"],
+    fields: [
+      { key: "name", label: "Nome", type: "text", required: true },
+      { key: "category", label: "Categoria", type: "select", required: true, options: ["Roupas", "Acessórios", "Uniformes"].map((v) => ({ value: v, label: v })), half: true, default: "Roupas" },
+      { key: "badge", label: "Selo", type: "text", half: true, help: "Ex.: Mais vendido, Lançamento (vazio = sem selo)" },
+      { key: "price", label: "Preço (R$)", type: "money", required: true, min: 0, half: true },
+      { key: "compareAtPrice", label: "Preço “de” (R$)", type: "money", nullable: true, min: 0, half: true, help: "Opcional, aparece riscado" },
+      { key: "stock", label: "Estoque (unidades)", type: "number", required: true, min: 0, half: true, default: 0 },
+      { key: "active", label: "Visível na loja", type: "boolean", half: true, default: true },
+      { key: "sizes", label: "Tamanhos", type: "list", help: "Um por linha. Vazio = tamanho único." },
+      { key: "customizable", label: "Aceita personalização (nome e número)", type: "boolean", default: false },
+      { key: "image", label: "Foto", type: "image" },
+      { key: "description", label: "Descrição", type: "textarea" },
+    ],
+  },
+  plans: {
+    name: "plans",
+    label: "Planos Sócio-Lobo",
+    singular: "plano",
+    columns: ["name", "price", "period", "highlight", "active"],
+    fields: [
+      { key: "name", label: "Nome do plano", type: "text", required: true },
+      { key: "tagline", label: "Chamada", type: "text" },
+      { key: "price", label: "Preço (R$)", type: "money", required: true, min: 0, half: true },
+      { key: "period", label: "Período", type: "select", options: [{ value: "mensal", label: "Mensal" }, { value: "semestral", label: "Semestral" }, { value: "anual", label: "Anual" }], default: "semestral", half: true },
+      { key: "benefits", label: "Benefícios", type: "list", help: "Um benefício por linha" },
+      { key: "highlight", label: "Destacar este plano", type: "boolean", half: true, default: false },
+      { key: "active", label: "Disponível para adesão", type: "boolean", half: true, default: true },
+    ],
+  },
+  titles: {
+    name: "titles",
+    label: "Galeria de títulos",
+    singular: "título",
+    columns: ["year", "championship", "modality", "category", "placement"],
+    sortBy: { key: "year", dir: "desc" },
+    fields: [
+      { key: "championship", label: "Campeonato", type: "text", required: true },
+      { key: "year", label: "Ano", type: "number", required: true, min: 1900, half: true, default: new Date().getFullYear() },
+      { key: "placement", label: "Colocação", type: "select", options: PLACEMENTS, required: true, half: true, default: "campeao" },
+      { key: "modality", label: "Modalidade", type: "select", optionsFrom: "modalities", required: true, half: true },
+      { key: "category", label: "Categoria", type: "select", options: categories, required: true, half: true, default: "Masculino" },
+      { key: "cover", label: "Foto de capa", type: "image" },
+      { key: "photos", label: "Galeria de fotos", type: "images" },
+      { key: "description", label: "Detalhes da conquista", type: "textarea" },
+    ],
+  },
+  orders: {
+    name: "orders",
+    label: "Pedidos",
+    singular: "pedido",
+    readOnly: true,
+    columns: ["createdAt", "customer", "total", "method", "status"],
+    sortBy: { key: "createdAt", dir: "desc" },
+    fields: [
+      {
+        key: "status",
+        label: "Status",
+        type: "select",
+        options: ["pendente", "pago", "cancelado", "entregue"].map((v) => ({ value: v, label: v })),
+      },
+    ],
+  },
+  settings: {
+    name: "settings",
+    label: "Configurações gerais",
+    singular: "configurações",
+    singleton: true,
+    columns: [],
+    fields: [
+      { key: "siteName", label: "Nome do site", type: "text", required: true },
+      { key: "tagline", label: "Frase de destaque", type: "text" },
+      { key: "announcement", label: "Aviso no topo do site", type: "text", help: "Vazio = sem aviso" },
+      { key: "modalities", label: "Modalidades", type: "list", help: "Uma por linha. Alimenta filtros e formulários." },
+      { key: "customizationPrice", label: "Valor da personalização de uniforme (R$)", type: "money", min: 0, half: true },
+      { key: "memberDiscountPercent", label: "Desconto do sócio na loja (%)", type: "number", min: 0, half: true },
+      { key: "instagram", label: "Instagram (@)", type: "text", half: true },
+      { key: "whatsapp", label: "WhatsApp (com DDD)", type: "text", half: true },
+      { key: "email", label: "E-mail de contato", type: "text" },
+    ],
+  },
+};
+
+export type ValidationResult<T> = { ok: true; value: T } | { ok: false; errors: string[] };
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+/** Normaliza e valida um registro conforme a definição de campos. */
+export function validateRecord(
+  spec: CollectionSpec,
+  raw: Record<string, unknown>,
+  ctx: { modalities: string[] },
+): ValidationResult<Record<string, unknown>> {
+  const out: Record<string, unknown> = {};
+  const errors: string[] = [];
+
+  for (const f of spec.fields) {
+    let v = raw[f.key];
+    const empty = v === undefined || v === null || v === "";
+    if (empty && f.default !== undefined) v = f.default;
+
+    switch (f.type) {
+      case "number":
+      case "money": {
+        if (v === undefined || v === null || v === "") {
+          if (f.nullable) { out[f.key] = null; break; }
+          if (f.required) { errors.push(`${f.label}: obrigatório`); break; }
+          out[f.key] = 0;
+          break;
+        }
+        const n = typeof v === "number" ? v : Number(String(v).replace(",", "."));
+        if (!Number.isFinite(n)) { errors.push(`${f.label}: número inválido`); break; }
+        if (f.min !== undefined && n < f.min) { errors.push(`${f.label}: mínimo ${f.min}`); break; }
+        out[f.key] = f.type === "money" ? Math.round(n * 100) / 100 : Math.round(n);
+        break;
+      }
+      case "boolean":
+        out[f.key] = v === true || v === "true" || v === "on";
+        break;
+      case "list":
+      case "images": {
+        const arr = Array.isArray(v) ? v : typeof v === "string" ? v.split("\n") : [];
+        out[f.key] = arr.map((s) => String(s).trim()).filter(Boolean);
+        if (f.required && (out[f.key] as string[]).length === 0) errors.push(`${f.label}: obrigatório`);
+        break;
+      }
+      default: {
+        const s = v === undefined || v === null ? "" : String(v).trim();
+        if (f.required && !s) { errors.push(`${f.label}: obrigatório`); break; }
+        if (s && f.type === "date" && !DATE_RE.test(s)) errors.push(`${f.label}: use AAAA-MM-DD`);
+        if (s && f.type === "time" && !TIME_RE.test(s)) errors.push(`${f.label}: use HH:MM`);
+        if (s && f.type === "select") {
+          const allowed = f.optionsFrom === "modalities" ? ctx.modalities : (f.options ?? []).map((o) => o.value);
+          if (!allowed.includes(s)) errors.push(`${f.label}: opção inválida “${s}”`);
+        }
+        out[f.key] = s;
+      }
+    }
+  }
+
+  if (spec.name === "trainings" && typeof out.start === "string" && typeof out.end === "string" && out.end <= out.start) {
+    errors.push("Fim do treino deve ser depois do início");
+  }
+
+  return errors.length ? { ok: false, errors } : { ok: true, value: out };
+}

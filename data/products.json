@@ -1,0 +1,106 @@
+[
+  {
+    "id": "p1",
+    "name": "Camisa Oficial Lobo 2026",
+    "description": "Dry-fit com escudo bordado. A camisa da alcateia.",
+    "category": "Uniformes",
+    "price": 119.9,
+    "compareAtPrice": 139.9,
+    "image": "/img/produto-camisa.svg",
+    "badge": "Mais vendido",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "stock": 42,
+    "customizable": true,
+    "active": true
+  },
+  {
+    "id": "p2",
+    "name": "Camisa de Jogo Reserva (Dourada)",
+    "description": "Modelo reserva, tecido leve e respirável.",
+    "category": "Uniformes",
+    "price": 109.9,
+    "compareAtPrice": null,
+    "image": "/img/produto-camisa-gold.svg",
+    "badge": "Lançamento",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "stock": 25,
+    "customizable": true,
+    "active": true
+  },
+  {
+    "id": "p3",
+    "name": "Moletom Alcateia",
+    "description": "Moletom flanelado com capuz e bolso canguru.",
+    "category": "Roupas",
+    "price": 189.9,
+    "compareAtPrice": null,
+    "image": "/img/produto-moletom.svg",
+    "badge": "",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "stock": 12,
+    "customizable": false,
+    "active": true
+  },
+  {
+    "id": "p4",
+    "name": "Camiseta Torcida Lobo",
+    "description": "100% algodão, estampa frontal.",
+    "category": "Roupas",
+    "price": 59.9,
+    "compareAtPrice": null,
+    "image": "/img/produto-camiseta.svg",
+    "badge": "",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "stock": 3,
+    "customizable": false,
+    "active": true
+  },
+  {
+    "id": "p5",
+    "name": "Caneca Lobo 350ml",
+    "description": "Caneca de cerâmica para o café da prova.",
+    "category": "Acessórios",
+    "price": 39.9,
+    "compareAtPrice": null,
+    "image": "/img/produto-caneca.svg",
+    "badge": "",
+    "sizes": [],
+    "stock": 30,
+    "customizable": false,
+    "active": true
+  },
+  {
+    "id": "p6",
+    "name": "Tirante de Crachá",
+    "description": "Tirante bordado azul e dourado.",
+    "category": "Acessórios",
+    "price": 19.9,
+    "compareAtPrice": null,
+    "image": "/img/produto-tirante.svg",
+    "badge": "Mais vendido",
+    "sizes": [],
+    "stock": 0,
+    "customizable": false,
+    "active": true
+  }
+]

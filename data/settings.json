@@ -1,0 +1,11 @@
+{
+  "siteName": "Portal do Esporte",
+  "tagline": "A alcateia joga junto. Jogos, treinos, loja e títulos da Atlética Lobo.",
+  "announcement": "Seletiva de vôlei feminino nesta quinta, 18h, Quadra 1 do CEFET!",
+  "modalities": ["Futsal", "Basquete", "Vôlei", "Handebol", "Futebol de Campo"],
+  "customizationPrice": 20,
+  "memberDiscountPercent": 15,
+  "instagram": "atleticalobo",
+  "whatsapp": "21999990000",
+  "email": "contato@atleticalobo.com.br"
+}
