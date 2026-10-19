@@ -108,7 +108,7 @@ export default async function Home() {
               {results.slice(0, 4).map((g) => (
                 <li key={g.id} className="card border-l-4 border-l-lobo-red p-4">
                   <p className="text-xs font-bold uppercase text-lobo-navy/60">{g.modality} {g.category} · {formatDate(g.date)}</p>
-                  <p className="mt-1 font-display text-2xl text-lobo-navy">Lobo {g.scoreLobo} × {g.scoreOpponent} <span className="text-base text-slate-500">{g.opponent.replace("Atlética ", "")}</span></p>
+                  <p className="mt-1 font-display text-2xl text-lobo-navy">CEFET {g.scoreLobo} × {g.scoreOpponent} <span className="text-base text-slate-500">{g.opponent.replace("Atlética ", "")}</span></p>
                 </li>
               ))}
             </ul>

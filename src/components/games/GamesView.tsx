@@ -53,19 +53,38 @@ export function GamesView({ games, modalities, today }: { games: Game[]; modalit
   );
 }
 
+function initials(name: string) {
+  const words = name.replace(/^Atl[ée]tica\s+/i, "").split(/\s+/).filter(Boolean);
+  return (words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? "?").slice(0, 2)).toUpperCase();
+}
+
+/** Escudo do time; sem imagem cadastrada, mostra as iniciais (ex.: "UFRJ EEFD" → "UE"). */
+function TeamBadge({ src, name, className }: { src: string; name: string; className: string }) {
+  if (src) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={src} alt={`Escudo ${name}`} className={`${className} object-contain`} />;
+  }
+  return (
+    <span aria-hidden="true" className={`${className} grid place-items-center rounded-full border-2 border-lobo-navy/20 bg-lobo-paper font-display text-lobo-navy`}>
+      {initials(name)}
+    </span>
+  );
+}
+
 function Crest({ src, name }: { src: string; name: string }) {
   return (
     <div className="flex w-24 flex-col items-center gap-2 text-center">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src || "/img/logo.png"} alt={`Escudo ${name}`} className="h-16 w-16 object-contain" />
+      <TeamBadge src={src} name={name} className="h-16 w-16 text-2xl" />
       <span className="text-xs font-semibold leading-tight">{name}</span>
     </div>
   );
 }
 
+const HOME_AWAY_LABEL: Record<Game["homeAway"], string> = { casa: "Mando do CEFET", fora: "Fora de casa", neutro: "Local neutro" };
+
 export function GameCard({ game, today, index = 0 }: { game: Game; today: string; index?: number }) {
   const status = gameStatus(game, today);
-  const home = game.homeAway === "casa";
+  const home = game.homeAway !== "fora"; // em casa ou neutro, o CEFET aparece à esquerda
   return (
     <article className="card animate-rise overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg" style={{ animationDelay: `${index * 60}ms` }}>
       <div className="bg-grain-navy flex items-center justify-between border-b-4 border-lobo-red px-4 py-2.5 text-white">
@@ -77,20 +96,20 @@ export function GameCard({ game, today, index = 0 }: { game: Game; today: string
       <div className="p-5">
         <p className="text-center text-xs font-semibold uppercase tracking-widest text-slate-500">{game.competition}</p>
         <div className="mt-4 flex items-center justify-between">
-          {home ? <Crest src="/img/logo.png" name="Lobo" /> : <Crest src={game.opponentLogo} name={game.opponent} />}
+          {home ? <Crest src="/img/logo.png" name="CEFET" /> : <Crest src={game.opponentLogo} name={game.opponent} />}
           <div className="text-center">
             <p className="font-display text-3xl text-lobo-navy">{formatDate(game.date)}</p>
             <p className="text-sm text-slate-500">{weekdayName(game.date)}</p>
             <p className="mt-1 inline-flex items-center gap-1 rounded-md bg-lobo-paper px-2 py-0.5 text-sm font-bold">
-              <IconClock className="h-4 w-4" /> {game.time}
+              <IconClock className="h-4 w-4" /> {game.time || "Horário a definir"}
             </p>
           </div>
-          {home ? <Crest src={game.opponentLogo} name={game.opponent} /> : <Crest src="/img/logo.png" name="Lobo" />}
+          {home ? <Crest src={game.opponentLogo} name={game.opponent} /> : <Crest src="/img/logo.png" name="CEFET" />}
         </div>
         <div className="mt-5 flex items-center justify-between gap-3 border-t pt-4">
           <p className="min-w-0 text-sm">
             <span className="block truncate font-semibold">{game.location}</span>
-            <span className="text-xs text-slate-500">{home ? "Mando do Lobo" : "Fora de casa"}</span>
+            <span className="text-xs text-slate-500">{HOME_AWAY_LABEL[game.homeAway] ?? ""}</span>
           </p>
           <a href={mapsUrl(game.address || game.location)} target="_blank" rel="noreferrer" className="btn-ghost flex-none px-3 py-2">
             <IconPin className="h-4 w-4" /> Ver no mapa
@@ -112,20 +131,22 @@ function ResultRow({ game }: { game: Game }) {
         <p className="font-display text-xl text-lobo-navy">{formatDate(game.date)}</p>
         <p className="text-xs text-slate-500">{game.modality}</p>
       </div>
-      <div className="flex flex-1 items-center justify-center gap-3">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/img/logo.png" alt="Lobo" className="h-10 w-10" />
-        <span className="font-display text-4xl tabular-nums text-lobo-navy">
-          {game.scoreLobo ?? "–"} <span className="text-slate-300">×</span> {game.scoreOpponent ?? "–"}
-        </span>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={game.opponentLogo || "/img/logo.png"} alt={game.opponent} className="h-10 w-10 object-contain" />
+      <div className="flex min-w-0 flex-1 flex-col items-center gap-1">
+        <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/img/logo.png" alt="CEFET" className="h-10 w-10" />
+          <span className="font-display text-4xl tabular-nums text-lobo-navy">
+            {game.scoreLobo ?? "–"} <span className="text-slate-300">×</span> {game.scoreOpponent ?? "–"}
+          </span>
+          <TeamBadge src={game.opponentLogo} name={game.opponent} className="h-10 w-10 text-sm" />
+        </div>
+        <p className="max-w-full truncate text-sm font-bold uppercase text-lobo-navy">CEFET × {game.opponent}</p>
       </div>
       <div className="flex w-28 flex-none flex-col items-end gap-1 text-right">
         <StatusBadge status="Finalizado" />
         <span className={`rounded px-1.5 text-[11px] font-bold uppercase text-white ${outcome.c}`}>{outcome.t}</span>
         <span className="truncate text-xs text-slate-500 sm:hidden">{formatDate(game.date)} · {game.modality}</span>
-        <span className="hidden text-xs text-slate-500 sm:block">{game.category} · vs {game.opponent}</span>
+        <span className="hidden text-xs text-slate-500 sm:block">{game.category}{game.notes ? ` · ${game.notes}` : ""}</span>
       </div>
     </article>
   );

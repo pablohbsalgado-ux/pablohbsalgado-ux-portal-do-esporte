@@ -13,10 +13,10 @@ export interface Game {
   opponent: string;
   opponentLogo: string;
   date: string; // AAAA-MM-DD
-  time: string; // HH:MM
+  time: string; // HH:MM ("" = a definir)
   location: string;
   address: string;
-  homeAway: "casa" | "fora";
+  homeAway: "casa" | "fora" | "neutro";
   status: GameStatus;
   scoreLobo: number | null;
   scoreOpponent: number | null;
