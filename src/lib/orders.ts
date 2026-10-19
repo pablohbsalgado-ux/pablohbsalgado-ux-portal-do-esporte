@@ -1,6 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { getCollection, newId, updateCollection } from "./store";
-import { paymentsDemoMode, startPayment } from "./payments";
+import { mercadoPagoEnabled, startPayment } from "./payments";
 import { setMemberStatus } from "./members";
 import type { MemberStatus, Order, OrderItem, OrderStatus } from "./types";
 
@@ -53,7 +53,17 @@ export async function priceCart(lines: CartLine[]): Promise<{ items: OrderItem[]
     if (total > product.stock) throw new CheckoutError(`Estoque insuficiente para ${product.name} (restam ${product.stock})`);
     wanted.set(product.id, total);
 
-    items.push({ kind: "product", refId: product.id, name: product.name, unitPrice, quantity, size: line.size || undefined, customization });
+    items.push({
+      kind: "product",
+      refId: product.id,
+      name: product.name,
+      unitPrice,
+      quantity,
+      size: line.size || undefined,
+      customization,
+      paymentLink: product.paymentLink || settings.paymentLink || "",
+      pixKey: product.pixKey || settings.pixKey || "",
+    });
   }
 
   const total = Math.round(items.reduce((s, i) => s + i.unitPrice * i.quantity, 0) * 100) / 100;
@@ -66,9 +76,26 @@ export async function createOrder(data: Omit<Order, "id" | "createdAt" | "status
   return order;
 }
 
-/** Cria o pedido, inicia o pagamento no Mercado Pago e devolve o que o navegador precisa. */
-export async function placeOrder(data: Omit<Order, "id" | "createdAt" | "status" | "paymentId" | "stockApplied" | "demo">) {
-  const order = await createOrder({ ...data, demo: paymentsDemoMode() });
+/**
+ * Cria o pedido e prepara o pagamento.
+ *  - padrão (manual): o cliente paga pela chave Pix / link InfinitePay de cada item e envia o
+ *    comprovante; a diretoria confere e marca "pago" no painel.
+ *  - com MP_ACCESS_TOKEN: pagamento automático pelo Mercado Pago (Pix com QR e Checkout Pro).
+ */
+export async function placeOrder(data: Omit<Order, "id" | "createdAt" | "status" | "paymentId" | "stockApplied" | "demo" | "provider">) {
+  if (!mercadoPagoEnabled()) {
+    const missing = data.items.filter((i) => (data.method === "pix" ? !i.pixKey : !i.paymentLink));
+    if (missing.length) {
+      throw new CheckoutError(
+        data.method === "pix"
+          ? `Pagamento por Pix indisponível para: ${missing.map((i) => i.name).join(", ")}. Escolha cartão ou fale com a diretoria.`
+          : `Pagamento por cartão indisponível para: ${missing.map((i) => i.name).join(", ")}. Escolha Pix ou fale com a diretoria.`,
+      );
+    }
+    const order = await createOrder({ ...data, demo: false, provider: "manual" });
+    return { orderId: order.id, total: order.total, payment: { kind: "manual" as const } };
+  }
+  const order = await createOrder({ ...data, demo: false, provider: "mercadopago" });
   const payment = await startPayment(order);
   await patchOrder(order.id, {
     paymentId: payment.paymentId,

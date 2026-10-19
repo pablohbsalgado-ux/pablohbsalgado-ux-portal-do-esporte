@@ -19,6 +19,16 @@ export async function POST(req: Request) {
   if (!plan) return NextResponse.json({ error: "Plano indisponível" }, { status: 400 });
   const athlete = isAthletePlan(plan);
 
+  // confere a forma de pagamento antes de gravar ficha e arquivos
+  const method = text("method") === "card" ? "card" : "pix";
+  const payTo = method === "pix" ? plan.pixKey || settings.pixKey : plan.paymentLink || settings.paymentLink;
+  if (!payTo && !process.env.MP_ACCESS_TOKEN) {
+    return NextResponse.json(
+      { error: method === "pix" ? "Pagamento por Pix indisponível para este plano. Escolha cartão ou fale com a diretoria." : "Pagamento por cartão indisponível para este plano. Escolha Pix ou fale com a diretoria." },
+      { status: 400 },
+    );
+  }
+
   let memberId = "";
   try {
     const data = validateMemberInput(
@@ -70,9 +80,19 @@ export async function POST(req: Request) {
     memberId = member.id;
 
     const result = await placeOrder({
-      method: text("method") === "card" ? "card" : "pix",
+      method,
       total: plan.price,
-      items: [{ kind: "plan", refId: plan.id, name: `Sócio-Lobo: ${plan.name} (${plan.period})`, unitPrice: plan.price, quantity: 1 }],
+      items: [
+        {
+          kind: "plan",
+          refId: plan.id,
+          name: `Sócio-Lobo: ${plan.name} (${plan.period})`,
+          unitPrice: plan.price,
+          quantity: 1,
+          paymentLink: plan.paymentLink || settings.paymentLink || "",
+          pixKey: plan.pixKey || settings.pixKey || "",
+        },
+      ],
       customer: { name: data.fullName, email: data.email, phone: data.phone, cpf: data.cpf },
       memberId: member.id,
       ...(account ? { accountId: account.id } : {}),

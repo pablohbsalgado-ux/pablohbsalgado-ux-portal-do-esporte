@@ -2,6 +2,7 @@
 // A MESMA definição gera os formulários do painel /admin e valida os dados no servidor:
 // para adicionar um campo novo basta incluí-lo aqui (e no tipo em ./types.ts).
 
+import { isPlausiblePixKey, normalizePixKey } from "./pix";
 import type { CollectionName } from "./types";
 
 export type FieldType =
@@ -15,7 +16,9 @@ export type FieldType =
   | "boolean"
   | "image"
   | "images"
-  | "list";
+  | "list"
+  | "url" // link https (ex.: link de pagamento InfinitePay)
+  | "pixkey"; // chave Pix (CPF, CNPJ, e-mail, telefone ou aleatória)
 
 export interface FieldSpec {
   key: string;
@@ -128,6 +131,8 @@ export const SPECS: Record<CollectionName, CollectionSpec> = {
       { key: "active", label: "Visível na loja", type: "boolean", half: true, default: true },
       { key: "sizes", label: "Tamanhos", type: "list", help: "Um por linha. Vazio = tamanho único." },
       { key: "customizable", label: "Aceita personalização (nome e número)", type: "boolean", default: false },
+      { key: "paymentLink", label: "Link de pagamento (crédito/débito)", type: "url", help: "Link criado na InfinitePay para este valor. Vazio = usa o link padrão das Configurações." },
+      { key: "pixKey", label: "Chave Pix", type: "pixkey", help: "CPF, CNPJ, e-mail, telefone ou chave aleatória. Vazio = usa a chave padrão das Configurações." },
       { key: "image", label: "Foto", type: "image" },
       { key: "description", label: "Descrição", type: "textarea" },
     ],
@@ -143,6 +148,8 @@ export const SPECS: Record<CollectionName, CollectionSpec> = {
       { key: "price", label: "Preço (R$)", type: "money", required: true, min: 0, half: true },
       { key: "period", label: "Período", type: "select", options: [{ value: "mensal", label: "Mensal" }, { value: "semestral", label: "Semestral" }, { value: "anual", label: "Anual" }], default: "semestral", half: true },
       { key: "benefits", label: "Benefícios", type: "list", help: "Um benefício por linha" },
+      { key: "paymentLink", label: "Link de pagamento (crédito/débito)", type: "url", help: "Link criado na InfinitePay para este valor. Vazio = usa o link padrão das Configurações." },
+      { key: "pixKey", label: "Chave Pix", type: "pixkey", help: "CPF, CNPJ, e-mail, telefone ou chave aleatória. Vazio = usa a chave padrão das Configurações." },
       { key: "athlete", label: "Plano de atleta", type: "boolean", half: true, default: false, help: "Exige foto, modalidades, comprovante de matrícula e termo de atleta na adesão" },
       { key: "highlight", label: "Destacar este plano", type: "boolean", half: true, default: false },
       { key: "active", label: "Disponível para adesão", type: "boolean", half: true, default: true },
@@ -220,6 +227,10 @@ export const SPECS: Record<CollectionName, CollectionSpec> = {
       { key: "scheduleNotice", label: "Aviso da escala de treinos", type: "text", help: "Aparece em destaque na aba Escala" },
       { key: "customizationPrice", label: "Valor da personalização de uniforme (R$)", type: "money", min: 0, half: true },
       { key: "memberDiscountPercent", label: "Desconto do sócio na loja (%)", type: "number", min: 0, half: true },
+      { key: "pixKey", label: "Chave Pix padrão", type: "pixkey", help: "Usada nos produtos e planos sem chave própria" },
+      { key: "pixReceiverName", label: "Nome do recebedor do Pix", type: "text", half: true, help: "Como aparece no banco (até 25 letras). Ex.: AAA CEFET RJ" },
+      { key: "pixCity", label: "Cidade do recebedor do Pix", type: "text", half: true, help: "Ex.: Rio de Janeiro" },
+      { key: "paymentLink", label: "Link de pagamento padrão (crédito/débito)", type: "url", help: "Usado quando o item não tem link próprio. Pode ser um link de valor livre da InfinitePay." },
       { key: "instagram", label: "Instagram (@)", type: "text", half: true },
       { key: "whatsapp", label: "WhatsApp (com DDD)", type: "text", half: true },
       { key: "email", label: "E-mail de contato", type: "text" },
@@ -276,6 +287,9 @@ export function validateRecord(
         if (f.required && !s) { errors.push(`${f.label}: obrigatório`); break; }
         if (s && f.type === "date" && !DATE_RE.test(s)) errors.push(`${f.label}: use AAAA-MM-DD`);
         if (s && f.type === "time" && !TIME_RE.test(s)) errors.push(`${f.label}: use HH:MM`);
+        if (s && f.type === "url" && !/^https:\/\/[^\s]+\.[^\s]+$/.test(s)) errors.push(`${f.label}: cole o link completo, começando com https://`);
+        if (s && f.type === "pixkey" && !isPlausiblePixKey(s)) errors.push(`${f.label}: chave Pix inválida (CPF, CNPJ, e-mail, telefone com DDD ou chave aleatória)`);
+        if (s && f.type === "pixkey") { out[f.key] = normalizePixKey(s); break; }
         if (s && f.type === "select") {
           const allowed = f.optionsFrom === "modalities" ? ctx.modalities : (f.options ?? []).map((o) => o.value);
           if (!allowed.includes(s)) errors.push(`${f.label}: opção inválida “${s}”`);

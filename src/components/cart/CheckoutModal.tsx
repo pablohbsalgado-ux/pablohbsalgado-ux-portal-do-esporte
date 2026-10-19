@@ -87,8 +87,8 @@ export function CheckoutModal() {
           <legend className="label">Forma de pagamento</legend>
           <div className="grid grid-cols-2 gap-3">
             {([
-              ["pix", "Pix", "QR Code na hora, aprovação imediata"],
-              ["card", "Cartão de crédito", "Até 6x, ambiente seguro Mercado Pago"],
+              ["pix", "Pix", "QR Code com o valor certo"],
+              ["card", "Cartão", "Crédito ou débito pela InfinitePay"],
             ] as const).map(([value, title, sub]) => (
               <label key={value} className={`cursor-pointer rounded-xl border-2 p-3 transition ${method === value ? "border-lobo-navy bg-lobo-paper" : "border-slate-200"}`}>
                 <input type="radio" name="method" value={value} checked={method === value} onChange={() => setMethod(value)} className="sr-only" />

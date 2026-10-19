@@ -13,13 +13,19 @@ const STATUS: { value: OrderStatus; label: string; cls: string }[] = [
 
 export function OrdersTable({ initial }: { initial: Order[] }) {
   const [orders, setOrders] = useState(initial);
-  const [filter, setFilter] = useState<OrderStatus | "all">("all");
+  const [filter, setFilter] = useState<OrderStatus | "all" | "conferir">("all");
   const [open, setOpen] = useState<string | null>(null);
 
-  const list = orders.filter((o) => filter === "all" || o.status === filter);
+  // "A conferir": pendentes com comprovante enviado — a fila de trabalho da diretoria
+  const toCheck = (o: Order) => o.status === "pendente" && !!o.paymentProof;
+  const list = orders.filter((o) => filter === "all" || (filter === "conferir" ? toCheck(o) : o.status === filter));
 
   async function change(o: Order, status: OrderStatus) {
-    if (status === "pago" && !o.stockApplied && !confirm("Marcar como pago vai baixar o estoque dos produtos. Confirmar?")) return;
+    if (status === "pago") {
+      const what = o.memberId ? "ativar a associação" : "baixar o estoque dos produtos";
+      const proof = o.paymentProof ? "" : "\n\nAtenção: o cliente ainda não enviou comprovante.";
+      if (!confirm(`Confirmou o recebimento de ${brl(o.total)} na InfinitePay/banco? Marcar como pago vai ${what}.${proof}`)) return;
+    }
     const res = await fetch(`/api/admin/orders/${o.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
     if (!res.ok) return alert("Erro ao atualizar");
     const updated: Order = await res.json();
@@ -27,9 +33,9 @@ export function OrdersTable({ initial }: { initial: Order[] }) {
   }
 
   function exportCsv() {
-    const rows = [["pedido", "data", "status", "metodo", "total", "nome", "email", "telefone", "cpf", "tipo", "itens"]];
+    const rows = [["pedido", "data", "status", "metodo", "total", "nome", "email", "telefone", "cpf", "tipo", "comprovante_enviado_em", "itens"]];
     for (const o of list) {
-      rows.push([o.id, o.createdAt, o.status, o.method, o.total.toFixed(2), o.customer.name, o.customer.email, o.customer.phone, o.customer.cpf, o.memberId ? "adesão" : o.accountId ? "loja (conta)" : "loja",
+      rows.push([o.id, o.createdAt, o.status, o.method, o.total.toFixed(2), o.customer.name, o.customer.email, o.customer.phone, o.customer.cpf, o.memberId ? "adesão" : o.accountId ? "loja (conta)" : "loja", o.proofSubmittedAt ?? "",
         o.items.map((i) => `${i.quantity}x ${i.name}${i.size ? ` ${i.size}` : ""}${i.customization ? ` [${i.customization.name} ${i.customization.number}]` : ""}`).join(" | ")]);
     }
     const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(";")).join("\n");
@@ -42,6 +48,9 @@ export function OrdersTable({ initial }: { initial: Order[] }) {
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
+        <button onClick={() => setFilter("conferir")} className={filter === "conferir" ? "chip-on" : "chip-off !border-lobo-red !text-lobo-red"}>
+          A conferir ({orders.filter(toCheck).length})
+        </button>
         {[{ value: "all" as const, label: "Todos" }, ...STATUS].map((s) => (
           <button key={s.value} onClick={() => setFilter(s.value)} className={filter === s.value ? "chip-on" : "chip-off"}>
             {s.label} ({s.value === "all" ? orders.length : orders.filter((o) => o.status === s.value).length})
@@ -78,7 +87,16 @@ export function OrdersTable({ initial }: { initial: Order[] }) {
                     <span className="block text-xs text-slate-500">{o.customer.email}</span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-2.5 font-semibold">{brl(o.total)}</td>
-                  <td className="px-4 py-2.5 uppercase">{o.method === "pix" ? "Pix" : "Cartão"}</td>
+                  <td className="px-4 py-2.5" onClick={(e) => e.stopPropagation()}>
+                    <span className="text-xs font-bold uppercase">{o.method === "pix" ? "Pix" : "Cartão"}</span>
+                    {o.paymentProof ? (
+                      <a href={`/api/admin/private/${o.paymentProof}`} target="_blank" rel="noreferrer" className="block whitespace-nowrap text-xs font-semibold text-lobo-red hover:underline">
+                        Ver comprovante ↗
+                      </a>
+                    ) : o.status === "pendente" ? (
+                      <span className="block whitespace-nowrap text-xs text-slate-400">sem comprovante</span>
+                    ) : null}
+                  </td>
                   <td className="px-4 py-2.5" onClick={(e) => e.stopPropagation()}>
                     <select
                       value={o.status}
@@ -104,7 +122,9 @@ export function OrdersTable({ initial }: { initial: Order[] }) {
                         ))}
                       </ul>
                       <p className="mt-2 text-xs text-slate-500">
-                        Tel.: {o.customer.phone || "—"} · CPF: {o.customer.cpf || "—"} · ID pagamento: {o.paymentId || "—"} · Estoque baixado: {o.stockApplied ? "sim" : "não"}
+                        Tel.: {o.customer.phone || "—"} · CPF: {o.customer.cpf || "—"} · Estoque baixado: {o.stockApplied ? "sim" : "não"}
+                        {o.proofSubmittedAt && ` · Comprovante enviado em ${new Date(o.proofSubmittedAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}`}
+                        {o.method === "pix" && o.provider === "manual" && ` · No extrato, procure a identificação ${o.id.replace(/[^A-Za-z0-9]/g, "")}`}
                       </p>
                     </td>
                   </tr>

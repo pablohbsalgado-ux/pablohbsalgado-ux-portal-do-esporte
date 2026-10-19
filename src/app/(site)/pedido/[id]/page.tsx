@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
+import { ManualPaymentPanel } from "@/components/cart/ManualPaymentPanel";
 import { OrderStatusPanel } from "@/components/cart/OrderStatusPanel";
+import { buildInstructions } from "@/lib/manual-payment";
+import { getCollection } from "@/lib/store";
 import { brl } from "@/lib/format";
 import { getOrder } from "@/lib/orders";
 
@@ -10,6 +13,7 @@ export default async function PedidoPage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   const order = await getOrder(id);
   if (!order) notFound();
+  const manual = order.provider === "manual" ? await buildInstructions(order, await getCollection("settings")) : null;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
@@ -17,7 +21,18 @@ export default async function PedidoPage({ params }: { params: Promise<{ id: str
       <h1 className="mt-1 text-4xl text-lobo-navy">Obrigado, {order.customer.name.split(" ")[0]}!</h1>
 
       <div className="mt-8 grid gap-6 md:grid-cols-[1fr_280px]">
-        <OrderStatusPanel orderId={order.id} initialStatus={order.status} method={order.method} pix={order.pix} demo={order.demo} />
+        {manual ? (
+          <ManualPaymentPanel
+            orderId={order.id}
+            initialStatus={order.status}
+            initialProofAt={order.proofSubmittedAt ?? ""}
+            instructions={manual}
+            total={order.total}
+            isMembership={!!order.memberId}
+          />
+        ) : (
+          <OrderStatusPanel orderId={order.id} initialStatus={order.status} method={order.method} pix={order.pix} demo={order.demo} />
+        )}
 
         <aside className="card h-fit p-5">
           <h2 className="text-xl text-lobo-navy">Resumo</h2>

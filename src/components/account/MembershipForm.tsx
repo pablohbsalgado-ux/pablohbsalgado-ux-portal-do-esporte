@@ -202,8 +202,8 @@ export function MembershipForm({ plan, athlete, modalities, account, terms }: Pr
       <Section n={athlete ? 5 : 4} title="Pagamento">
         <div className="grid grid-cols-2 gap-3 sm:col-span-2">
           {([
-            ["pix", "Pix", "QR Code na hora"],
-            ["card", "Cartão de crédito", "Ambiente seguro Mercado Pago"],
+            ["pix", "Pix", "QR Code com o valor certo"],
+            ["card", "Cartão", "Crédito ou débito pela InfinitePay"],
           ] as const).map(([value, title, sub]) => (
             <label key={value} className={`cursor-pointer rounded-xl border-2 p-3 transition ${method === value ? "border-lobo-navy bg-lobo-paper" : "border-slate-200"}`}>
               <input type="radio" name="methodChoice" value={value} checked={method === value} onChange={() => setMethod(value)} className="sr-only" />

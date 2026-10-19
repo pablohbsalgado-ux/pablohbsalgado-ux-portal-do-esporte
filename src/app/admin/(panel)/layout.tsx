@@ -30,7 +30,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         <AdminNav isDataOwner={admin.id === DATA_OWNER} />
         <div className="hidden space-y-1 px-5 py-4 text-[11px] text-white/50 md:block">
           <p>Conteúdo: {usingSupabase() ? "Supabase" : "arquivos JSON"}</p>
-          <p>Pagamentos: {paymentsDemoMode() ? "modo demonstração" : "Mercado Pago ativo"}</p>
+          <p>Pagamentos: {paymentsDemoMode() ? "Pix + link InfinitePay" : "Mercado Pago ativo"}</p>
         </div>
       </aside>
       <div className="min-w-0 bg-lobo-paper">{children}</div>

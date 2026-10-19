@@ -148,6 +148,9 @@ export function RecordForm({
               />
             );
             break;
+          case "url":
+            control = <input id={id} type="url" inputMode="url" className="input" placeholder="https://" value={String(v ?? "")} onChange={(e) => set(f.key, e.target.value)} />;
+            break;
           case "date":
           case "time":
             control = <input id={id} type={f.type} className="input" value={String(v ?? "")} onChange={(e) => set(f.key, e.target.value)} />;

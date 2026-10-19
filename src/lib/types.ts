@@ -52,6 +52,8 @@ export interface Product {
   stock: number;
   customizable: boolean;
   active: boolean;
+  paymentLink?: string; // link InfinitePay (crédito/débito)
+  pixKey?: string;
 }
 
 export interface Plan {
@@ -64,6 +66,8 @@ export interface Plan {
   highlight: boolean;
   active: boolean;
   athlete?: boolean; // plano de atleta: exige foto, modalidades, comprovante e termo de atleta
+  paymentLink?: string;
+  pixKey?: string;
 }
 
 export type Placement = "campeao" | "vice" | "terceiro" | "destaque";
@@ -92,6 +96,10 @@ export interface Settings {
   announcement: string;
   schedulePeriod: string;
   scheduleNotice: string;
+  pixKey?: string; // chave Pix padrão
+  pixReceiverName?: string;
+  pixCity?: string;
+  paymentLink?: string; // link de pagamento padrão
 }
 
 export type OrderStatus = "pendente" | "pago" | "cancelado" | "entregue";
@@ -104,6 +112,8 @@ export interface OrderItem {
   quantity: number;
   size?: string;
   customization?: { name: string; number: string };
+  paymentLink?: string; // copiados do produto/plano no momento da compra
+  pixKey?: string;
 }
 
 export interface Order {
@@ -120,6 +130,9 @@ export interface Order {
   pix?: { qrCodeBase64: string; copyPaste: string; expiresAt: string };
   accountId?: string; // compra de produtos: conta que fez o pedido
   memberId?: string; // adesão de sócio: ficha vinculada
+  provider?: "manual" | "mercadopago"; // manual = chave Pix/link InfinitePay + comprovante
+  paymentProof?: string; // comprovante enviado pelo cliente (arquivo privado)
+  proofSubmittedAt?: string;
 }
 
 /** Conta de cliente (obrigatória para comprar produtos). */

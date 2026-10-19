@@ -1,16 +1,21 @@
-// Integração com o Mercado Pago.
+// Integração opcional com o Mercado Pago (só é usada se MP_ACCESS_TOKEN estiver definido;
+// sem ele o site usa pagamento manual por chave Pix / link InfinitePay — ver orders.ts e pix.ts).
 //  - Pix: pagamento criado direto pela API (/v1/payments) → QR Code exibido no próprio site.
 //  - Cartão: Checkout Pro (/checkout/preferences) → o cliente paga no ambiente seguro do MP
 //    e volta para /pedido/[id]. Nenhum dado de cartão passa pelo nosso servidor.
-// Sem MP_ACCESS_TOKEN tudo roda em modo demonstração (nada é cobrado).
 
 import QRCode from "qrcode";
 import type { Order } from "./types";
 
 const API = "https://api.mercadopago.com";
 
+export function mercadoPagoEnabled() {
+  return !!process.env.MP_ACCESS_TOKEN;
+}
+
+/** Sem Mercado Pago o site usa pagamento manual (chave Pix / link InfinitePay + comprovante). */
 export function paymentsDemoMode() {
-  return !process.env.MP_ACCESS_TOKEN;
+  return !mercadoPagoEnabled();
 }
 
 export function siteUrl() {

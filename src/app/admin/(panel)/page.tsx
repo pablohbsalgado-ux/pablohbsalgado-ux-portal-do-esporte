@@ -17,6 +17,7 @@ export default async function AdminHome() {
   const { upcoming } = splitGames(games, today);
   const pendingScore = games.filter((g) => g.status !== "finalizado" && g.date < today);
   const lowStock = products.filter((p) => p.active && p.stock <= 5).sort((a, b) => a.stock - b.stock);
+  const toCheck = orders.filter((o) => o.status === "pendente" && !!o.paymentProof);
   const paid = orders.filter((o) => o.status === "pago" || o.status === "entregue");
 
   const stats = [
@@ -43,6 +44,16 @@ export default async function AdminHome() {
           </Link>
         ))}
       </div>
+
+      {toCheck.length > 0 && (
+        <Link href="/admin/orders" className="mt-6 flex items-center justify-between gap-3 rounded-xl border-2 border-lobo-red bg-red-50 p-4 text-lobo-red hover:bg-red-100">
+          <span>
+            <strong className="font-display text-2xl">💳 {toCheck.length} pagamento(s) a conferir</strong>
+            <span className="block text-sm text-red-800">Clientes enviaram comprovante. Confira na InfinitePay/banco e marque como pago.</span>
+          </span>
+          <span className="font-bold uppercase">Ver →</span>
+        </Link>
+      )}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section className="card p-5">

@@ -92,7 +92,18 @@ O arquivo `render.yaml` já descreve o serviço. No Render: **New → Blueprint*
 
 ---
 
-## Pagamentos (Mercado Pago)
+## Pagamentos (Pix + link InfinitePay)
+
+O site usa as formas de recebimento que a Atlética já tem:
+
+1. Em cada **produto** e **plano de sócio** há dois campos: **Link de pagamento (crédito/débito)**, com o link criado na InfinitePay, e **Chave Pix**. Em **Configurações** ficam a chave Pix e o link **padrão**, usados nos itens que não têm os seus, e também o nome e a cidade do recebedor do Pix.
+2. **Pix:** a página do pedido gera o QR Code e o "Pix copia e cola" oficial (BR Code do Banco Central, `src/lib/pix.ts`) **com o valor exato** e o número do pedido, que aparece no extrato. Se o carrinho tiver itens com chaves diferentes, a página gera um código por chave.
+3. **Cartão:** a página do pedido mostra o botão do link InfinitePay de cada item.
+4. O cliente envia o **comprovante** (PDF ou imagem, guardado como arquivo privado). No painel, em **Pedidos → A conferir**, a diretoria abre o comprovante, confere o valor na InfinitePay ou no banco e marca **Pago**. O sistema então baixa o estoque, ativa o sócio e registra a ação no histórico.
+
+Se um item não tiver chave Pix ou link, nem um padrão definido, aquela forma de pagamento fica indisponível e o cliente é avisado no checkout.
+
+### Pagamento automático (opcional): Mercado Pago
 
 1. Crie uma aplicação em <https://www.mercadopago.com.br/developers> e copie o **Access Token** para `MP_ACCESS_TOKEN`. Use o token de teste para homologar.
 2. Defina `NEXT_PUBLIC_SITE_URL` com a URL pública do site.
