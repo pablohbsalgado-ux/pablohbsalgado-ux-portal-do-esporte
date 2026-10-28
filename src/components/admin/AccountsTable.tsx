@@ -115,7 +115,7 @@ export function AccountsTable({ initial }: { initial: AccountRow[] }) {
                               <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${STATUS_CLS[o.status]}`}>{o.status}</span>
                               <span className="text-xs text-slate-500">{new Date(o.createdAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</span>
                               <span className="text-slate-700">
-                                {o.items.map((i) => `${i.quantity}× ${i.name}${i.size ? ` (${i.size})` : ""}${i.customization ? ` [${i.customization.name} ${i.customization.number}]` : ""}`).join(" · ")}
+                                {o.items.map((i) => `${i.quantity}× ${i.name}${i.lot ? ` — ${i.lot}` : ""}${i.size ? ` (${i.size})` : ""}${i.customization ? ` [${i.customization.name} ${i.customization.number}]` : ""}`).join(" · ")}
                               </span>
                               <strong>{brl(o.total)}</strong>
                             </li>

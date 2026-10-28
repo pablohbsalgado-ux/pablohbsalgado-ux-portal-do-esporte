@@ -52,6 +52,7 @@ export interface Product {
   stock: number;
   customizable: boolean;
   active: boolean;
+  featured?: boolean; // destaque na página inicial
   paymentLink?: string; // link InfinitePay (crédito/débito)
   pixKey?: string;
 }
@@ -66,6 +67,39 @@ export interface Plan {
   highlight: boolean;
   active: boolean;
   athlete?: boolean; // plano de atleta: exige foto, modalidades, comprovante e termo de atleta
+  paymentLink?: string;
+  pixKey?: string;
+}
+
+export type EventType = "festa" | "campeonato" | "jogo" | "outro";
+
+/** Lote de ingressos. A virada acontece em endsAt (horário de Brasília) ou quando marcado como esgotado. */
+export interface EventLot {
+  name: string;
+  price: number;
+  endsAt: string; // "AAAA-MM-DDTHH:MM" (vazio = vale até esgotar)
+  soldOut: boolean;
+}
+
+/** Evento (festas e eventos esportivos) com venda de ingressos por lote. */
+export interface LoboEvent {
+  id: string;
+  name: string;
+  type: EventType;
+  description: string;
+  image: string;
+  date: string; // AAAA-MM-DD
+  time: string; // HH:MM
+  duration: string; // texto livre: "8 horas", "2 dias"…
+  location: string;
+  address: string;
+  lots: EventLot[];
+  salesOpen: boolean;
+  featured: boolean; // destaque na página inicial
+  active: boolean;
+  pastEditions: string;
+  pastPhotos: string[];
+  pastVideo: string;
   paymentLink?: string;
   pixKey?: string;
 }
@@ -105,14 +139,16 @@ export interface Settings {
 export type OrderStatus = "pendente" | "pago" | "cancelado" | "entregue";
 
 export interface OrderItem {
-  kind: "product" | "plan";
+  kind: "product" | "plan" | "event";
   refId: string;
   name: string;
   unitPrice: number;
   quantity: number;
   size?: string;
   customization?: { name: string; number: string };
-  paymentLink?: string; // copiados do produto/plano no momento da compra
+  lot?: string; // ingresso: nome do lote vigente na compra
+  eventDate?: string;
+  paymentLink?: string; // copiados do produto/plano/evento no momento da compra
   pixKey?: string;
 }
 
@@ -183,6 +219,7 @@ export interface Collections {
   products: Product[];
   plans: Plan[];
   titles: Title[];
+  events: LoboEvent[];
   orders: Order[];
   accounts: Account[];
   members: Member[];

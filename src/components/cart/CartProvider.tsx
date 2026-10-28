@@ -4,7 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 export interface CartItem {
   key: string;
-  kind: "product" | "plan";
+  kind: "product" | "plan" | "event";
+  subtitle?: string; // ingresso: lote e data, para exibir no carrinho
   id: string;
   name: string;
   image: string;
@@ -45,7 +46,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       // planos de sócio não passam mais pelo carrinho (têm ficha de adesão própria)
-      if (raw) setItems((JSON.parse(raw) as CartItem[]).filter((i) => i.kind === "product"));
+      if (raw) setItems((JSON.parse(raw) as CartItem[]).filter((i) => i.kind === "product" || i.kind === "event"));
     } catch {}
     setLoaded(true);
   }, []);

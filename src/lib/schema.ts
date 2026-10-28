@@ -18,6 +18,7 @@ export type FieldType =
   | "images"
   | "list"
   | "url" // link https (ex.: link de pagamento InfinitePay)
+  | "lots" // lotes de ingresso: nome, preço, virada e esgotado
   | "pixkey"; // chave Pix (CPF, CNPJ, e-mail, telefone ou aleatória)
 
 export interface FieldSpec {
@@ -60,6 +61,13 @@ export const WEEK_DAYS = [
   { value: "sex", label: "Sexta" },
   { value: "sab", label: "Sábado" },
 ] as const;
+
+export const EVENT_TYPES = [
+  { value: "festa", label: "Festa" },
+  { value: "campeonato", label: "Campeonato esportivo" },
+  { value: "jogo", label: "Jogo" },
+  { value: "outro", label: "Outro" },
+];
 
 export const PLACEMENTS = [
   { value: "campeao", label: "Campeão" },
@@ -131,6 +139,7 @@ export const SPECS: Record<CollectionName, CollectionSpec> = {
       { key: "active", label: "Visível na loja", type: "boolean", half: true, default: true },
       { key: "sizes", label: "Tamanhos", type: "list", help: "Um por linha. Vazio = tamanho único." },
       { key: "customizable", label: "Aceita personalização (nome e número)", type: "boolean", default: false },
+      { key: "featured", label: "Destaque na página inicial (lançamento)", type: "boolean", default: false },
       { key: "paymentLink", label: "Link de pagamento (crédito/débito)", type: "url", help: "Link criado na InfinitePay para este valor. Vazio = usa o link padrão das Configurações." },
       { key: "pixKey", label: "Chave Pix", type: "pixkey", help: "CPF, CNPJ, e-mail, telefone ou chave aleatória. Vazio = usa a chave padrão das Configurações." },
       { key: "image", label: "Foto", type: "image" },
@@ -153,6 +162,33 @@ export const SPECS: Record<CollectionName, CollectionSpec> = {
       { key: "athlete", label: "Plano de atleta", type: "boolean", half: true, default: false, help: "Exige foto, modalidades, comprovante de matrícula e termo de atleta na adesão" },
       { key: "highlight", label: "Destacar este plano", type: "boolean", half: true, default: false },
       { key: "active", label: "Disponível para adesão", type: "boolean", half: true, default: true },
+    ],
+  },
+  events: {
+    name: "events",
+    label: "Eventos",
+    singular: "evento",
+    columns: ["date", "name", "type", "salesOpen", "featured", "active"],
+    sortBy: { key: "date", dir: "desc" },
+    fields: [
+      { key: "name", label: "Nome do evento", type: "text", required: true },
+      { key: "type", label: "Tipo", type: "select", required: true, half: true, default: "festa", options: EVENT_TYPES },
+      { key: "image", label: "Foto ilustrativa", type: "image", half: true },
+      { key: "description", label: "Descrição", type: "textarea" },
+      { key: "date", label: "Data", type: "date", required: true, half: true },
+      { key: "time", label: "Horário de início", type: "time", half: true },
+      { key: "duration", label: "Duração", type: "text", half: true, help: "Ex.: 8 horas, das 15h às 23h, 3 dias" },
+      { key: "location", label: "Local", type: "text", required: true, half: true },
+      { key: "address", label: "Endereço para o mapa", type: "text" },
+      { key: "lots", label: "Lotes de ingresso", type: "lots", help: "Em ordem. O site mostra o primeiro lote não esgotado e ainda dentro do prazo; na data/hora da virada o preço muda sozinho." },
+      { key: "salesOpen", label: "Vendas abertas no site", type: "boolean", half: true, default: true },
+      { key: "featured", label: "Destaque na página inicial", type: "boolean", half: true, default: false },
+      { key: "active", label: "Visível no site", type: "boolean", half: true, default: true },
+      { key: "paymentLink", label: "Link de pagamento (crédito/débito)", type: "url", help: "Link InfinitePay do ingresso. Vazio = usa o link padrão das Configurações." },
+      { key: "pixKey", label: "Chave Pix", type: "pixkey", help: "Vazio = usa a chave padrão das Configurações." },
+      { key: "pastEditions", label: "Reprise das últimas edições (texto)", type: "textarea", help: "Ex.: Edição 2.0 teve 800 pessoas, open bar de 6h…" },
+      { key: "pastPhotos", label: "Fotos das últimas edições", type: "images" },
+      { key: "pastVideo", label: "Vídeo das últimas edições", type: "url", help: "Link do YouTube, Instagram ou Drive (aftermovie)" },
     ],
   },
   titles: {
@@ -258,6 +294,22 @@ export function validateRecord(
     if (empty && f.default !== undefined) v = f.default;
 
     switch (f.type) {
+      case "lots": {
+        const rows = Array.isArray(v) ? v : [];
+        const lots = [];
+        for (const [i, r] of rows.entries()) {
+          const row = (r ?? {}) as Record<string, unknown>;
+          const name = String(row.name ?? "").trim() || `${i + 1}º lote`;
+          const price = typeof row.price === "number" ? row.price : Number(String(row.price ?? "").replace(",", "."));
+          const endsAt = String(row.endsAt ?? "").trim();
+          if (!Number.isFinite(price) || price < 0) { errors.push(`${f.label}: preço inválido no ${name}`); continue; }
+          if (endsAt && !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(endsAt)) { errors.push(`${f.label}: data de virada inválida no ${name}`); continue; }
+          lots.push({ name: name.slice(0, 40), price: Math.round(price * 100) / 100, endsAt, soldOut: row.soldOut === true });
+        }
+        if (f.required && lots.length === 0) errors.push(`${f.label}: cadastre ao menos um lote`);
+        out[f.key] = lots;
+        break;
+      }
       case "number":
       case "money": {
         if (v === undefined || v === null || v === "") {

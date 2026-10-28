@@ -1,24 +1,28 @@
 import Link from "next/link";
+import { FeaturedLaunches } from "@/components/FeaturedLaunches";
 import { GameCard } from "@/components/games/GamesView";
 import { Scribble, Star } from "@/components/ui";
 import { brl, formatDate, splitGames, todayISO } from "@/lib/format";
 import { getCollection } from "@/lib/store";
 
-export const revalidate = 300;
+export const revalidate = 60; // preço do lote em destaque muda por horário
 
 const TILES = [
   { href: "/jogos", title: "Jogos", text: "Calendário, locais e placares" },
   { href: "/escala", title: "Escala", text: "Horários de treino da semana" },
+  { href: "/eventos", title: "Eventos", text: "Festas, campeonatos e ingressos" },
   { href: "/vendas", title: "Vendas", text: "Loja oficial e Sócio-Lobo" },
   { href: "/titulos", title: "Títulos", text: "Nossa sala de troféus" },
 ];
 
 export default async function Home() {
-  const [games, plans, titles, settings] = await Promise.all([
+  const [games, plans, titles, settings, events, products] = await Promise.all([
     getCollection("games"),
     getCollection("plans"),
     getCollection("titles"),
     getCollection("settings"),
+    getCollection("events"),
+    getCollection("products"),
   ]);
   const today = todayISO();
   const { upcoming, results } = splitGames(games, today);
@@ -76,12 +80,12 @@ export default async function Home() {
       </section>
 
       <div className="mx-auto max-w-7xl px-4">
-        <nav className="relative -mt-10 grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Seções">
+        <nav className="relative -mt-10 grid grid-cols-2 gap-3 md:grid-cols-5" aria-label="Seções">
           {TILES.map((t, i) => (
             <Link
               key={t.href}
               href={t.href}
-              className={`group relative overflow-hidden rounded-xl p-5 text-white shadow-lg transition hover:-translate-y-1 ${i % 2 ? "bg-grain-red" : "bg-grain-navy"}`}
+              className={`group relative overflow-hidden rounded-xl p-5 text-white shadow-lg transition hover:-translate-y-1 ${i % 2 ? "bg-grain-red" : "bg-grain-navy"} ${i === TILES.length - 1 ? "col-span-2 md:col-span-1" : ""}`}
             >
               <span className="absolute right-3 top-2 font-display text-5xl leading-none text-white/15">0{i + 1}</span>
               <p className="relative font-display text-3xl uppercase">{t.title} <span className="inline-block transition group-hover:translate-x-1">→</span></p>
@@ -89,6 +93,8 @@ export default async function Home() {
             </Link>
           ))}
         </nav>
+
+        <FeaturedLaunches events={events.filter((e) => e.active)} products={products} now={new Date()} />
 
         <section className="mt-14">
           <div className="flex items-end justify-between">

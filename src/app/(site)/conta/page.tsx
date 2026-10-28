@@ -105,7 +105,7 @@ export default async function ContaPage() {
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${ORDER_STATUS[o.status].cls}`}>{ORDER_STATUS[o.status].label}</span>
                     </div>
                     <p className="mt-1 text-slate-600">
-                      {o.items.map((i) => `${i.quantity}× ${i.name}${i.size ? ` (${i.size})` : ""}`).join(" · ")}
+                      {o.items.map((i) => `${i.quantity}× ${i.name}${i.lot ? ` — ${i.lot}` : ""}${i.size ? ` (${i.size})` : ""}`).join(" · ")}
                     </p>
                     <p className="text-xs text-slate-500">
                       {new Date(o.createdAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })} · {o.method === "pix" ? "Pix" : "Cartão"} · <strong>{brl(o.total)}</strong>

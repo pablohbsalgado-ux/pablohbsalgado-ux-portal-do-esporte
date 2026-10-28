@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/admin/products", label: "Produtos e estoque" },
   { href: "/admin/plans", label: "Planos de sócio" },
   { href: "/admin/titles", label: "Títulos" },
+  { href: "/admin/events", label: "Eventos" },
   { href: "/admin/orders", label: "Pedidos" },
   { href: "/admin/accounts", label: "Clientes" },
   { href: "/admin/members", label: "Sócios" },

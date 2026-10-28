@@ -43,9 +43,9 @@ export default async function PedidoPage({ params }: { params: Promise<{ id: str
                   <span>{i.quantity}× {i.name}</span>
                   <span className="flex-none font-semibold">{brl(i.unitPrice * i.quantity)}</span>
                 </div>
-                {(i.size || i.customization) && (
+                {(i.size || i.customization || i.lot) && (
                   <p className="text-xs text-slate-500">
-                    {[i.size && `Tam. ${i.size}`, i.customization && `${i.customization.name} #${i.customization.number}`].filter(Boolean).join(" · ")}
+                    {[i.lot, i.size && `Tam. ${i.size}`, i.customization && `${i.customization.name} #${i.customization.number}`].filter(Boolean).join(" · ")}
                   </p>
                 )}
               </li>

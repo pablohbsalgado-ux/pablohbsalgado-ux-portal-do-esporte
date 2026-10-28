@@ -25,7 +25,7 @@ export interface ManualInstructions {
   links: LinkLine[];
 }
 
-const itemLabel = (i: Order["items"][number]) => `${i.quantity}× ${i.name}${i.size ? ` (${i.size})` : ""}`;
+const itemLabel = (i: Order["items"][number]) => `${i.quantity}× ${i.name}${i.lot ? ` — ${i.lot}` : ""}${i.size ? ` (${i.size})` : ""}`;
 
 /**
  * Pix: um código por chave (normalmente uma só, com o valor total do pedido).

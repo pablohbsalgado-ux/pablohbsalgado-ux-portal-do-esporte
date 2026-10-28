@@ -1,6 +1,6 @@
 # 🐺 Portal do Esporte — Atlética Lobo
 
-Central de informações e portal de transparência da Atlética Lobo: **Jogos**, **Escala de treinos**, **Vendas** (loja + Sócio-Lobo) e **Títulos**.
+Central de informações e portal de transparência da Atlética Lobo: **Jogos**, **Escala de treinos**, **Eventos**, **Vendas** (loja + Sócio-Lobo) e **Títulos**.
 **Todo o conteúdo que muda com a temporada é editado pelo painel `/admin`, sem mexer no código.**
 
 | Stack | |
@@ -38,6 +38,7 @@ Protegido por perfis com senha individual (veja *Perfis do painel* abaixo). A se
 | **Produtos e estoque** | Preço, preço "de", estoque, fotos, selo ("Mais vendido"), tamanhos, visibilidade e se aceita personalização |
 | **Planos de sócio** | Preço, período, lista de benefícios, destaque e disponibilidade |
 | **Títulos** | Novas conquistas com capa e galeria de fotos (upload) |
+| **Eventos** | Festas, campeonatos e jogos: descrição, foto, data, horário, duração, local, lotes com virada, reprise das últimas edições, link de pagamento e chave Pix |
 | **Pedidos** | Acompanhar e mudar o status (pendente → pago → entregue) e exportar para planilha (CSV) |
 | **Configurações** | Nome e frase do site, aviso no topo, **lista de modalidades**, valor da personalização, desconto do sócio e contatos |
 
@@ -46,6 +47,15 @@ No status **Automático**, o card do jogo mostra *Hoje*, *Em Breve* (próximos 3
 ### Adicionar um campo novo
 
 Os formulários do painel e a validação no servidor saem da mesma definição, em `src/lib/schema.ts`. Para criar um campo novo, inclua-o ali e no tipo correspondente em `src/lib/types.ts`.
+
+---
+
+## Eventos e lançamentos
+
+- Em **Eventos** a diretoria cadastra festas, campeonatos e jogos com nome, descrição, foto, data, horário, duração, local e a **reprise das últimas edições** (texto, fotos e vídeo do YouTube).
+- **Lotes:** cada lote tem nome, preço e data/hora da virada (horário de Brasília). O lote à venda é o primeiro que não está esgotado e cuja virada ainda não passou. A virada é automática e o preço cobrado é sempre recalculado no servidor na hora da compra.
+- Ingressos vão para o carrinho como os produtos (até 10 por pedido) e exigem conta. O pedido guarda o lote comprado.
+- **Destaque na página inicial:** marque "Destaque na página inicial" em um evento ou produto para que ele apareça em **Lançamentos**, na home. Eventos só aparecem enquanto há ingresso à venda e produtos enquanto há estoque.
 
 ---
 
@@ -122,7 +132,7 @@ Como funciona:
 
 ```
 data/                    conteúdo (JSON) + uploads
-src/app/(site)/          páginas públicas: /, /jogos, /escala, /vendas, /titulos, /pedido/[id]
+src/app/(site)/          páginas públicas: /, /jogos, /escala, /eventos, /vendas, /titulos, /pedido/[id]
 src/app/admin/           login + painel (/admin, /admin/[coleção])
 src/app/api/             checkout, status do pedido, webhook MP, APIs do painel
 src/components/          UI (jogos, escala, loja, títulos, carrinho, painel)

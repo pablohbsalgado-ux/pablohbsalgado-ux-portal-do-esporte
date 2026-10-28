@@ -115,6 +115,7 @@ export function OrdersTable({ initial }: { initial: Order[] }) {
                         {o.items.map((i, idx) => (
                           <li key={idx}>
                             {i.quantity}× {i.name}
+                            {i.lot && ` · ${i.lot}`}
                             {i.size && ` · Tam. ${i.size}`}
                             {i.customization && ` · Personalização: ${i.customization.name} #${i.customization.number}`}
                             {" — "}{brl(i.unitPrice * i.quantity)}

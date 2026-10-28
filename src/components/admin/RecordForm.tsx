@@ -7,7 +7,7 @@ type Values = Record<string, unknown>;
 
 export function emptyRecord(fields: FieldSpec[]): Values {
   return Object.fromEntries(
-    fields.map((f) => [f.key, f.default ?? (f.type === "list" || f.type === "images" ? [] : f.type === "boolean" ? false : f.nullable ? null : "")]),
+    fields.map((f) => [f.key, f.default ?? (f.type === "list" || f.type === "images" || f.type === "lots" ? [] : f.type === "boolean" ? false : f.nullable ? null : "")]),
   );
 }
 
@@ -108,6 +108,45 @@ function ImagesInput({ value, onChange }: { value: string[]; onChange: (v: strin
   );
 }
 
+type Lot = { name: string; price: number | string; endsAt: string; soldOut: boolean };
+
+/** Lista de lotes: nome, preço, data/hora da virada e "esgotado". A ordem define a sequência dos lotes. */
+function LotsInput({ value, onChange }: { value: Lot[]; onChange: (v: Lot[]) => void }) {
+  const update = (i: number, patch: Partial<Lot>) => onChange(value.map((l, j) => (j === i ? { ...l, ...patch } : l)));
+  const move = (i: number, d: number) => {
+    const next = [...value];
+    [next[i], next[i + d]] = [next[i + d], next[i]];
+    onChange(next);
+  };
+  return (
+    <div className="space-y-2">
+      {value.map((l, i) => (
+        <div key={i} className={`grid grid-cols-2 gap-2 rounded-lg border-2 p-3 sm:grid-cols-[1.2fr_.8fr_1.4fr_auto] ${l.soldOut ? "border-slate-200 bg-slate-50" : "border-lobo-navy/15"}`}>
+          <input className="input" aria-label={`Nome do lote ${i + 1}`} placeholder={`${i + 1}º lote`} value={l.name} onChange={(e) => update(i, { name: e.target.value })} />
+          <input className="input" aria-label={`Preço do lote ${i + 1}`} type="number" step="0.01" min={0} placeholder="R$" value={l.price === null || l.price === undefined ? "" : String(l.price)} onChange={(e) => update(i, { price: e.target.value === "" ? "" : Number(e.target.value) })} />
+          <label className="col-span-2 text-xs text-slate-500 sm:col-span-1">
+            Vira em (Brasília)
+            <input className="input mt-0.5" type="datetime-local" value={l.endsAt} onChange={(e) => update(i, { endsAt: e.target.value })} />
+          </label>
+          <div className="col-span-2 flex items-center justify-between gap-2 sm:col-span-1 sm:flex-col sm:items-end">
+            <label className="flex items-center gap-1 text-xs font-semibold">
+              <input type="checkbox" className="h-4 w-4 accent-lobo-navy" checked={l.soldOut} onChange={(e) => update(i, { soldOut: e.target.checked })} /> Esgotado
+            </label>
+            <span className="flex gap-1 text-xs">
+              <button type="button" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Subir lote" className="rounded border px-1.5 disabled:opacity-30">↑</button>
+              <button type="button" disabled={i === value.length - 1} onClick={() => move(i, 1)} aria-label="Descer lote" className="rounded border px-1.5 disabled:opacity-30">↓</button>
+              <button type="button" onClick={() => onChange(value.filter((_, j) => j !== i))} aria-label="Remover lote" className="rounded border border-red-200 px-1.5 text-red-600">✕</button>
+            </span>
+          </div>
+        </div>
+      ))}
+      <button type="button" className="btn-ghost w-full py-2 text-xs" onClick={() => onChange([...value, { name: `${value.length + 1}º lote`, price: "", endsAt: "", soldOut: false }])}>
+        + Adicionar lote
+      </button>
+    </div>
+  );
+}
+
 export function RecordForm({
   fields,
   values,
@@ -187,6 +226,9 @@ export function RecordForm({
             break;
           case "images":
             control = <ImagesInput value={Array.isArray(v) ? (v as string[]) : []} onChange={(x) => set(f.key, x)} />;
+            break;
+          case "lots":
+            control = <LotsInput value={Array.isArray(v) ? (v as Lot[]) : []} onChange={(x) => set(f.key, x)} />;
             break;
           default:
             control = <input id={id} className="input" value={String(v ?? "")} onChange={(e) => set(f.key, e.target.value)} />;

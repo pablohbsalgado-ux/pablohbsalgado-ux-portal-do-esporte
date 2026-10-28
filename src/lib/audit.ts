@@ -16,7 +16,11 @@ const MAX_VALUE = 300;
 function show(v: unknown): string {
   if (v === null || v === undefined || v === "") return "—";
   if (typeof v === "boolean") return v ? "Sim" : "Não";
-  const s = Array.isArray(v) ? v.join(" · ") : typeof v === "object" ? JSON.stringify(v) : String(v);
+  const s = Array.isArray(v)
+    ? v.map((x) => (x && typeof x === "object" ? Object.values(x).filter((y) => y !== "" && y !== false).join(" ") : String(x))).join(" · ")
+    : typeof v === "object"
+      ? JSON.stringify(v)
+      : String(v);
   return s.length > MAX_VALUE ? `${s.slice(0, MAX_VALUE)}…` : s;
 }
 

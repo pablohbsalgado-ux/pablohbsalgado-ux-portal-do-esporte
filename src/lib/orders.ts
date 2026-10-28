@@ -1,11 +1,12 @@
 import { revalidatePath } from "next/cache";
 import { getCollection, newId, updateCollection } from "./store";
 import { mercadoPagoEnabled, startPayment } from "./payments";
+import { canBuy, currentLot } from "./events";
 import { setMemberStatus } from "./members";
 import type { MemberStatus, Order, OrderItem, OrderStatus } from "./types";
 
 export interface CartLine {
-  kind: "product" | "plan";
+  kind: "product" | "plan" | "event";
   id: string;
   quantity: number;
   size?: string;
@@ -20,7 +21,7 @@ export class CheckoutError extends Error {}
  */
 export async function priceCart(lines: CartLine[]): Promise<{ items: OrderItem[]; total: number }> {
   if (!Array.isArray(lines) || lines.length === 0 || lines.length > 30) throw new CheckoutError("Carrinho vazio ou inválido");
-  const [products, settings] = await Promise.all([getCollection("products"), getCollection("settings")]);
+  const [products, events, settings] = await Promise.all([getCollection("products"), getCollection("events"), getCollection("settings")]);
 
   const items: OrderItem[] = [];
   const wanted = new Map<string, number>();
@@ -32,6 +33,27 @@ export async function priceCart(lines: CartLine[]): Promise<{ items: OrderItem[]
     if (line.kind === "plan") {
       // A adesão de sócio tem ficha própria (/socio/[plano]) e não passa pelo carrinho.
       throw new CheckoutError("A associação é feita pela ficha de adesão do Sócio-Lobo");
+    }
+
+    if (line.kind === "event") {
+      // ingresso: o preço é sempre o do lote vigente agora (a virada pode ter acontecido
+      // depois que o ingresso foi para o carrinho)
+      const event = events.find((e) => e.id === line.id);
+      if (!event || !canBuy(event)) throw new CheckoutError(`Ingressos indisponíveis para ${event?.name ?? "este evento"}`);
+      if (quantity > 10) throw new CheckoutError("Máximo de 10 ingressos por pedido");
+      const { lot } = currentLot(event);
+      items.push({
+        kind: "event",
+        refId: event.id,
+        name: `Ingresso: ${event.name}`,
+        unitPrice: lot!.price,
+        quantity,
+        lot: lot!.name,
+        eventDate: event.date,
+        paymentLink: event.paymentLink || settings.paymentLink || "",
+        pixKey: event.pixKey || settings.pixKey || "",
+      });
+      continue;
     }
 
     const product = products.find((p) => p.id === line.id && p.active);

@@ -88,6 +88,7 @@ const EMPTY: { [K in CollectionName]: () => Collections[K] } = {
   products: () => [],
   plans: () => [],
   titles: () => [],
+  events: () => [],
   orders: () => [],
   accounts: () => [],
   members: () => [],

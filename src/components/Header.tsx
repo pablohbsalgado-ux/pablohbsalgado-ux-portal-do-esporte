@@ -10,6 +10,7 @@ import { IconCart, IconClose, IconMenu, IconUser } from "./icons";
 const NAV = [
   { href: "/jogos", label: "Jogos" },
   { href: "/escala", label: "Escala" },
+  { href: "/eventos", label: "Eventos" },
   { href: "/vendas", label: "Vendas" },
   { href: "/titulos", label: "Títulos" },
 ];
@@ -44,7 +45,7 @@ export function Header({ announcement, siteName }: { announcement?: string; site
                   key={n.href}
                   href={n.href}
                   aria-current={active ? "page" : undefined}
-                  className={`px-4 py-2 font-display text-xl uppercase tracking-wide transition ${active ? "text-white" : "text-white/70 hover:text-white"}`}
+                  className={`px-2.5 py-2 font-display text-lg uppercase tracking-wide transition lg:px-4 lg:text-xl ${active ? "text-white" : "text-white/70 hover:text-white"}`}
                 >
                   {n.label}
                   <span className={`mx-auto mt-0.5 block h-1 -skew-x-12 bg-lobo-red transition-all ${active ? "w-full" : "w-0"}`} />

@@ -47,12 +47,12 @@ export function CartDrawer() {
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold leading-tight">{item.name}</p>
                     <p className="mt-0.5 text-xs text-slate-500">
-                      {[item.size && `Tam. ${item.size}`, item.customization && `${item.customization.name} #${item.customization.number}`]
+                      {[item.subtitle, item.size && `Tam. ${item.size}`, item.customization && `${item.customization.name} #${item.customization.number}`]
                         .filter(Boolean)
                         .join(" · ")}
                     </p>
                     <div className="mt-2 flex items-center justify-between">
-                      {item.kind === "product" ? (
+                      {item.kind !== "plan" ? (
                         <div className="flex items-center rounded-lg border">
                           <button className="px-2.5 py-1" aria-label="Diminuir" onClick={() => cart.setQuantity(item.key, item.quantity - 1)}>−</button>
                           <span className="w-6 text-center text-sm">{item.quantity}</span>
